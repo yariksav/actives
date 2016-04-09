@@ -1,0 +1,30 @@
+{
+    "name": "yariksav/actives",
+    "description": "Actives handler module for Yii2 (Dialogs, Grids, Trees, etc)",
+    "keywords": ["yii2", "dialogs", "yariksav"],
+    "type": "yii2-extension",
+    "license": "MIT",
+    "support": {
+        "issues": "https://github.com/yariksav/actives/issues?state=open",
+        "forum": "https://gitter.im/yariksav/actives",
+        "source": "https://github.com/yariksav/actives"
+    },
+    "authors": [
+        {
+            "name": "Savaryn Yaroslav",
+            "email": "yariksav@gmail.com",
+            "homepage": "https://github.com/yariksav"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "yiisoft/yii2": "~2.0"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+        "psr-4": {
+            "yariksav\\actives\\": ""
+        }
+    }
+}
