@@ -1,6 +1,6 @@
 <?php
 
-namespace yariksav\actives\components;
+namespace yariksav\actives\view\columns;
 
 use yii;
 use yii\helpers\ArrayHelper;
@@ -8,16 +8,17 @@ use yii\data\ActiveDataProvider;
 use yii\base\Model;
 use yii\db\ActiveQueryInterface;
 use yii\helpers\Inflector;
+use yariksav\actives\base\Component;
+use yariksav\actives\base\ProtectedObject;
 
-class SyDataColumn extends SyComponent
+class Column extends ProtectedObject
 {
-    public $id;
+
     public $name;
     public $value;
-    public $visible=true;
     public $header;
     public $format = null;
-    public $grid;
+    //public $grid;
     public $type='text';
     public $footer;
     public $sortable=true;
@@ -34,9 +35,13 @@ class SyDataColumn extends SyComponent
     public $headerOptions = [];
     //public $footerOptions = [];
 
-    public function __construct($grid)
-    {
-        $this->grid=$grid;
+    //-------------
+    protected $activeObject;
+
+
+    function __construct($activeObject, $config = []) {
+        parent::__construct($config);
+        $this->activeObject = $activeObject;
     }
 
     public function init()
@@ -80,7 +85,7 @@ class SyDataColumn extends SyComponent
 
     public function renderHeader()
     {
-        $provider = $this->grid->dataProvider;
+        $provider = $this->activeObject->dataProvider;
         $header = $this->header;
         if ($header === null) {
             if ($provider instanceof ActiveDataProvider && $provider->query instanceof ActiveQueryInterface) {
@@ -105,27 +110,31 @@ class SyDataColumn extends SyComponent
             $this->headerOptions['width'] = $this->width;
 
         $column = [
-            'id'=>$this->name,
             'options'=>$this->htmlOptions,
             'header'=>$header,
         ];
-        if ($this->hidden === true)
+        if ($this->hidden === true) {
             $column['visible'] = false;
+        }
 
         $column['sortable'] = $this->sortable;
 
-        if ($this->headerOptions)
+        if ($this->headerOptions) {
             $column['headerOptions'] = $this->headerOptions;
-
+        }
         return $column;
     }
 
     public function renderDataCell($row, $data){
-        if($this->value!==null)
-            $value=$this->evaluateExpression($this->value, ['data'=>$data,'row'=>$row, 'columnData'=>$this->data]);
-        elseif($this->name!==null)
-            $value=ArrayHelper::getValue($data,$this->name);
-
+        if($this->value!==null) {
+            $value = call_user_func_array($this->value, [
+                'data' => $data,
+                'row' => $row,
+                'columnData' => $this->data
+            ]);
+        } elseif($this->name!==null) {
+            $value = ArrayHelper::getValue($data, $this->name);
+        }
         if ($this->format){
             $function = is_array($this->format) ? ArrayHelper::getValue($this->format, 0) : $this->format;
             $arg1 = is_array($this->format) ? ArrayHelper::getValue($this->format, 1) : null;

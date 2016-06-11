@@ -1,8 +1,8 @@
 <?php
 
-namespace yariksav\actives\components;
+namespace yariksav\actives\base;
 
-class MsgException extends SyException{
+class MsgException extends Exception{
 
     public function __construct($msg, $params = array(), $code = 0, $category = 'app.error'){
         if (is_integer($params)){

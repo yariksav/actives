@@ -1,8 +1,8 @@
 <?php
 
-namespace yariksav\actives\components;
+namespace yariksav\actives\base;
 
-class SyException extends \Exception {
+class Exception extends \Exception {
 
     protected static function createAndThrow($message = null, $code = 0){
         $class = get_class();

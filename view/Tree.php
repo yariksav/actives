@@ -1,11 +1,11 @@
 <?php
 
-namespace yariksav\actives\components;
+namespace yariksav\actives\view;
 
 use yii\helpers\Url;
 use yii\helpers\Html;
 
-class SyTree extends SyView
+class Tree extends ActiveView
 {
     protected $selected = array();
     protected $buttons;
@@ -45,7 +45,7 @@ class SyTree extends SyView
 
     protected function renderOptions(){
         $this->response->name = $this->name;
-        $this->response->url = Url::toRoute('sy/api/grid');
+        $this->response->url = Url::toRoute('actives/api/grid');
         //$this->response->selected = $this->request['selected'];
         $this->response->labels = array(
             'refresh'=>\Yii::t('app', 'Refresh'),

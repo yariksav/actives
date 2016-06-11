@@ -1,10 +1,10 @@
 <?php
 
-namespace yariksav\actives\components;
+namespace yariksav\actives\view\columns;
 
 use yii\helpers\ArrayHelper;
 
-class SyDateColumn extends SyDataColumn{
+class DateColumn extends Column{
 
     public $width = 190;
     public $align = 'center';

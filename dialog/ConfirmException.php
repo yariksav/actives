@@ -1,8 +1,8 @@
 <?php
 
-namespace yariksav\actives\components;
+namespace yariksav\actives\dialog;
 
-class SyConfirmException extends \yii\base\Exception{
+class ConfirmException extends \yii\base\Exception{
 
     public $buttons;
     public $id;

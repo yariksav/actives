@@ -10,9 +10,10 @@ use yii\web\HttpException;
 use yii\helpers\ArrayHelper;
 
 use yariksav\actives;
-use yariksav\actives\components\SyActiveObject;
-use yariksav\actives\components\SyException;
-use yariksav\actives\components\SyConfirmException;
+use yariksav\actives\base\ActiveObject;
+use yariksav\actives\base\Exception;
+use yariksav\actives\dialog\ConfirmException;
+use yariksav\actives\dialog\ValidationException;
 
 class ApiController extends Controller
 {
@@ -22,7 +23,7 @@ class ApiController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'index' => ['post', 'get'],
+                    'index' => ['post'],
                 ],
             ],
         ];
@@ -31,24 +32,36 @@ class ApiController extends Controller
     public $enableCsrfValidation = false;
 
     public function actionIndex(){
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        Yii::$app->response->headers->add('Access-Control-Allow-Origin','*');
 
         $dialog = null;
         $response = [];
         try{
-            $data = \Yii::$app->request->post('data');
+            $data = Yii::$app->request->post('data');
 
             //$data = strtr($data, array('#u002F'=>'/', '#u002B'=>'+', '#u0026'=>'&', '#u0025'=>'%'));
             $data = json_decode($data, true);
+            unset($data['permissions'], $data['actions'], $data['controls']);
 
-            $dialog = SyActiveObject::createInstance($data);
-            $response = $dialog->build();
+            $dialog = ActiveObject::createObject($data);
+            $response = json_encode($dialog->run());
         }
         // Для логики опросов
-        catch (SyConfirmException $e){
+        catch (ConfirmException $e){
             $confirm['confirm'] = ArrayHelper::getValue($data, 'confirm', array());
-            $confirm['confirm'][$e->id] = array('message'=>$e->getMessage(), 'buttons'=>$e->buttons);
+            $confirm['confirm'][$e->id] = [
+                'message'=>$e->getMessage(),
+                'buttons'=>$e->buttons
+            ];
             $response = json_encode($confirm);
+        }
+        catch (ValidationException $e){
+            $response = json_encode([
+                'error'=>$e->getMessage(),
+                'validation'=>$e->validation
+            ]);
         }
         catch (HttpException $e){
             throw $e;
@@ -73,7 +86,12 @@ class ApiController extends Controller
     }
 
     public function actionGrid(){
-        $grid = SyActiveObject::createInstance($_REQUEST);
+        $data = Yii::$app->request->post('data');
+        $data = json_decode($data, true);
+        $grid = ActiveObject::createObject($data);
+        $grid->run();
+//        ActiveObject::createObject($data);
+
         Yii::$app->response->format = 'json';
         return $grid->response;
 

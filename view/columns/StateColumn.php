@@ -1,11 +1,10 @@
 <?php
-namespace yariksav\actives\components;
+namespace yariksav\actives\view\columns;
 
 use yii\helpers\ArrayHelper;
 
-class SyStateColumn extends SyDataColumn
+class StateColumn extends Column
 {
-    //public $header = '';
     public $values = array();
     public $sortable = false;
     public $filter;
@@ -19,7 +18,7 @@ class SyStateColumn extends SyDataColumn
 
     public function renderFilterContent(){
         if($this->filter && $this->values){
-            $data = array();
+            $data = [];
             foreach($this->values as $key=>$value){
                 $data[$key]=$value['title'];
             }
@@ -32,7 +31,7 @@ class SyStateColumn extends SyDataColumn
     }
 
     public function renderDataCell($row,$data){
-        $value = isset($this->value) ? $this->evaluateExpression($this->value,['data'=>$data]) : ArrayHelper::getValue($data,$this->name);
+        $value = isset($this->value) ? call_user_func_array($this->value, ['data'=>$data]) : ArrayHelper::getValue($data,$this->name);
         if ($value === false && isset($this->values['false']))
             $value = 'false';
         if ($value === true && isset($this->values['true']))
@@ -50,6 +49,6 @@ class SyStateColumn extends SyDataColumn
         else
             $type = 'label';
 
-        return array('type'=>$type, 'options' => $status);
+        return ['type'=>$type, 'options' => $status];
     }
 }

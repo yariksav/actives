@@ -1,5 +1,5 @@
 <?php
-namespace yariksav\actives\components;
+namespace yariksav\actives\view;
 
 use yii;
 use yii\helpers\Html;
@@ -8,48 +8,73 @@ use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
 use yariksav\actives\Module;
+use yariksav\actives\controls\ControlMgr;
+use yariksav\actives\view\columns\ColumnMgr;
+use yariksav\actives\view\buttons\ButtonMgr;
+use yariksav\actives\view\plugins\PluginMgr;
 
 
-class SyGrid extends SyView
+class Grid extends ActiveView
 {
+    //!!
+    public $sort;
+    public $page;
+    public $newcount;
+    //!!
     const C_GRID_SELECTION =1;
-    //private $_formatter;
-    protected $_columns;
-    protected $_buttons;
-    public $searchPhrase = false;
+
+
     public $filter = [];
     protected $filterPrepared = [];
     protected $filters;
     public $title;
     //protected $dateFilter;
 
-    // flags
-    public $sorting = false;
-    public $searching = false;
-
-    public $pagination = false;
-    public $columnSelection = false;
-    public $columnMenu = false;
-    public $contextMenu = false;
+    //public $columnSelection = false;
     public $refreshButton = true;
     public $saveState = false;
 
     public $dataProvider;
-    public $blankDisplay='&nbsp;';
-    public $nullDisplay='&nbsp;';
+    //public $blankDisplay='&nbsp;';
+    //public $nullDisplay='&nbsp;';
+
     protected $rowCount = 10;
     protected $identifier = 'id';
     protected $tree;
-//	protected $rowHtmlOptionsExpression;
-//	protected $rowCssClassExpression;
-//	protected $rowCssClass;
 
-    public $buttons = null;
-    public $columns = null;
+
     public $itemOptions;
     protected  $storage;
 
+
+    // new!
+    protected $_columns;
+    protected $_buttons;
+    protected $_plugins;
+
+    function __construct($config = []) {
+        $this->_columns = new ColumnMgr($this);
+        $this->_buttons = new ButtonMgr($this);
+        $this->_plugins = new PluginMgr($this);
+        parent::__construct($config);
+    }
+
+    public function setColumns($value) {
+        $this->_columns->load($value);
+    }
+
+    public function setButtons($value) {
+        $this->_buttons->load($value);
+    }
+
+    public function setPlugins($value) {
+        $this->_plugins->load($value);
+    }
+
     protected function _init(){
+
+
+
         $this->init();
         $this->rowCount = $this->getState('rowCount', $this->rowCount);
 
@@ -81,15 +106,17 @@ class SyGrid extends SyView
             $this->dataProvider = $this->data();*/
 
 
-        $this->_columns = isset($this->columns) ? $this->evaluateExpression($this->columns, ['grid'=>$this]) : $this->columns();
-        $this->initColumns();
+        //$this->_columns = isset($this->columns) ? $this->evaluateExpression($this->columns, ['grid'=>$this]) : $this->columns();
+        //$this->initColumns();
+
     }
 
-    protected function _wrap($data, $view){
-        $name = $this->name . '-' . time();
-        $view->registerJs(";$(\".$name\").sygrid(".json_encode($data).");", yii\web\View::POS_READY);
-        return Html::tag('div', '', ['class' => $name.'  '.$this->name.' grid-view clear-top']);
-    }
+//
+//    protected function _wrap($data, $view){
+//        $name = $this->name . '-' . time();
+//        $view->registerJs(";$(\".$name\").sygrid(".json_encode($data).");", yii\web\View::POS_READY);
+//        return Html::tag('div', '', ['class' => $name.'  '.$this->name.' grid-view clear-top']);
+//    }
 
     public function getResponse(){
         $response = $this->response;
@@ -101,18 +128,14 @@ class SyGrid extends SyView
 
     public function init(){}
     public function data(){}
-    public function columns(){}
-    public function buttons(){}
+
+
     public function filters(){}
-    public function options(){}
     public function export(){}
 
     /*
      *  ACTIONS
      */
-    protected function prepareButtons(){
-        $this->_buttons = isset($this->buttons) ? $this->evaluateExpression($this->buttons, ['grid'=>$this]) : $this->buttons();
-    }
 
     protected function prepareData(){
         $model = isset($this->request['model']) ? $this->request['model'] : null;
@@ -121,25 +144,24 @@ class SyGrid extends SyView
     }
 
     public function actionInit(){
-        $this->renderTitle();
-        $this->prepareFilters();
-        $this->prepareButtons();
+        //$this->prepareFilters();
+
         $this->prepareData();
-        $this->renderOptions();
         $this->setSorting();
         $this->setPagination();
         $this->renderTableBody();
-        $this->renderFooter();
+
+        $this->renderOptions();
+
+        //$this->renderFooter();
     }
 
     public function actionLoad(){
-        $this->renderTitle();
-        $this->prepareButtons();
         $this->prepareData();
         $this->setSorting();
         $this->setPagination();
         $this->renderTableBody();
-        $this->renderFooter();
+        //$this->renderFooter();
     }
 
     public function actionSetCount(){
@@ -149,8 +171,7 @@ class SyGrid extends SyView
     }
 
     public function renderTitle(){
-        if ($this->title)
-            $this->response->title = $this->title;
+
     }
 
     public function actionExport(){
@@ -161,7 +182,7 @@ class SyGrid extends SyView
         $exports = $this->export();
 
         $export = $exports[$this->request['type']];
-        $this->response->columns = $this->renderColumns();
+        //$this->response->columns = $this->renderColumns();//!!!!!!!!!!!
         $data = $this->response;//json_encode($this->response->data);
         call_user_func($export['export'], $data);
         //$export['export']($data);
@@ -182,7 +203,7 @@ class SyGrid extends SyView
 
     protected function setSorting(){
         $sort = [];
-        if (isset($this->request['sort'])) foreach($this->request['sort'] as $key=>$value) {
+        if (isset($this->sort)) foreach($this->sort as $key => $value) {
             $sort[] = ($value == 'desc' ? '-' : '').$key;
         }
         $sort = implode(',', $sort);
@@ -199,12 +220,12 @@ class SyGrid extends SyView
 
     protected function setPagination(){
         if ($this->dataProvider) {
-            if (!$this->pagination || $this->rowCount < 0) {
+/*            if (!$this->pagination || $this->rowCount < 0) {
                 $this->dataProvider->pagination = false;
             } else if ($this->dataProvider->pagination) {
                 $this->dataProvider->pagination->pageSize = $this->rowCount;
                 $this->dataProvider->pagination->page = isset($this->request['page']) ? $this->request['page'] - 1 : 0;
-            }
+            }*/
         }
     }
 
@@ -226,75 +247,7 @@ class SyGrid extends SyView
         fpassthru($f);
     }
 
-    public function actionSetColumnsState(){
-        $this->setState('columnsState', json_encode($this->request['columns']));
-    }
 
-
-
-    /**
-     * Creates column objects and initializes them.
-     */
-    protected function initColumns()
-    {
-        if ($this->_columns) foreach($this->_columns as $i=>$col)
-        {
-            if(is_string($col))
-                $column=$this->createDataColumn($col);
-            else
-            {
-                if (empty($col['class']))
-                    $col['class'] = SyDataColumn::className();
-                else {
-                    $col['class'] =  __NAMESPACE__.'\\'.$col['class'];
-                }
-                $column = Yii::createObject($col, [$this]);
-            }
-            if(!$column->visible)
-            {
-                unset($this->_columns[$i]);
-                continue;
-            }
-            $this->_columns[$i]=$column;
-        }
-
-        if ($this->_columns) foreach($this->_columns as $column) {
-            $column->init();
-
-            $filterValue = ($this->filter && $column->name && isset($this->filter[$column->name])) ? $this->filter[$column->name] : null;
-            $this->filterPrepared[$column->name] = $column->prepareFilterValue($filterValue);
-
-        }
-    }
-
-    protected function createDataColumn($text)
-    {
-        if(!preg_match('/^([\w\.]+)(:(\w*))?(:(.*))?$/',$text,$matches))
-            throw new CException(Yii::t('zii','The column must be specified in the format of "Name:Type:Label", where "Type" and "Label" are optional.'));
-        $column=new SyDataColumn($this);
-        $column->name=$matches[1];
-        if(isset($matches[3]) && $matches[3]!=='')
-            $column->type=$matches[3];
-        if(isset($matches[5]))
-            $column->header=$matches[5];
-        return $column;
-    }
-
-    protected function renderColumns(){
-        $columns = array();
-        $columnsState = (array)json_decode($this->getState('columnsState'));
-        if ($this->_columns) foreach($this->_columns as $col) {
-            $column = $col->renderHeader();
-            if ($this->columnSelection && $columnsState && isset($columnsState[$column['id']])) {
-                $state = (array)$columnsState[$column['id']];
-                $column['visible'] = filter_var(ArrayHelper::getValue($state, 'visible', true), FILTER_VALIDATE_BOOLEAN);
-            }
-            if (isset($column['options']) && !$column['options'])
-                unset($column['options']);
-            $columns[] = $column;
-        }
-        return $columns;
-    }
 
     protected function prepareFilterFalues(){
 
@@ -327,63 +280,56 @@ class SyGrid extends SyView
         return $this->filters;
     }
 
-    protected function renderFooter(){
-        $footer = array();
-        if ($this->_columns) foreach($this->_columns as $col) {
-            if (isset($col->footer)){
-                if (is_callable($col->footer))
-                    $col->footer=$this->evaluateExpression($col->footer,array('data'=>$this));
-                $footer[$col->name]=$col->footer;
-            }
-        }
-        if ($footer)
-            $this->response->data->footer = $footer;
-    }
+
 
 
     protected function renderOptions(){
         //$options = new stdClass();
+        if ($this->title) {
+            $this->response->title = $this->title;
+        }
         $this->response->name = $this->name;
-        $this->response->url = Url::toRoute('/sy/api/grid');
+        $this->response->url = Url::toRoute('/actives/api/grid');
 
-
-        $this->response->searching = $this->searching;
-        $this->response->sorting = $this->sorting;
-        $this->response->pagination = $this->pagination;
-        $this->response->columnSelection = $this->columnSelection;
-        $this->response->columnMenu = $this->columnMenu;
-        $this->response->contextMenu = $this->contextMenu;
+        //$this->response->columnSelection = $this->columnSelection;
         $this->response->refreshButton = $this->refreshButton;
+        $this->response->plugins = $this->_plugins->build();
 
-        $this->response->buttons = $this->renderButtons($this->_buttons);
-        $this->response->export = $this->renderExport();
 
-        $this->response->columns = $this->renderColumns();
+        //$this->response->export = $this->renderExport();
+
+        $this->response->columns = $this->_columns->build();
+        $this->response->buttons = $this->_buttons->build();
+        $this->response->affect = $this->affect;
+        //renderButtons($this->_buttons);
 
         if ($this->filters) {
-            $helper = new SyDialogConstructor($this->filter);
-            $this->response->filters = $helper->buildControls($this->filters);
+            $helper = new ControlMgr($this->filter);
+            //!!! $this->response->filters = $helper->buildControls($this->filters);
         }
-        $this->response->filter = $this->filter;
+        //$this->response->filter = $this->filter;
         /*$this->response->filter = $this->filter;
         if ($this->tree){
             $tree = SyView::getInstance($this->tree);
             if ($tree)
                 $this->response->tree = $tree->getResponse();;
         }*/
+
+        $this->response->params = new \stdClass();
+        $this->response->params->class = $this->className();
+        $this->response->params->filter = $this->filter;
     }
 
     public function renderTableBody(){
         $this->response->data = new \stdClass();
-        $this->response->data->rows = array();
+        $this->response->data->rows = [];
         if ($this->dataProvider) {
             $data = $this->dataProvider->getModels();
             if (($count = $this->dataProvider->getCount()) > 0) {
-                $n = count($data);
-
-                if ($n > 0) {
-                    foreach ($data as $row => $item)
+                if (count($data) > 0) {
+                    foreach ($data as $row => $item) {
                         $this->response->data->rows[] = $this->renderTableRow($row, $item);
+                    }
                 }
             }
             $pagination = $this->dataProvider->getPagination();
@@ -394,12 +340,12 @@ class SyGrid extends SyView
                 $this->response->data->rowCount = (int)$this->rowCount;
             }
         }
+
     }
 
-    public function renderTableRow($row, $data)
+    public function renderTableRow($index, $data)
     {
-        $rowArray = array();
-        $htmlOptions=array();
+        $htmlOptions=[];
 
         /*if($this->rowHtmlOptionsExpression!==null)
         {
@@ -423,21 +369,22 @@ class SyGrid extends SyView
         }*/
 
 
-        if ($this->_columns) foreach($this->_columns as $column) {
-            //var_export($column->renderDataCell($row, $data[$row]));
-            $rowArray[$column->name] = $column->renderDataCell($row, $data);
+        $row = [
+            'buttons' => $this->_buttons->buildRow($data),
+            'cells' => $this->_columns->buildRow($index, $data),
+        ];
+
+        if ($htmlOptions) {
+            $row['options'] = $htmlOptions;
         }
-        $rowArray = array('cells'=>$rowArray);
-        if ($htmlOptions)
-            $rowArray['options'] = $htmlOptions;
+        if (isset($data[$this->identifier])) {
+            $row['params'] = [
+                'id' => $data[$this->identifier]
+            ];
+        }
 
-        if (isset($data[$this->identifier]))
-            $rowArray['params'] = array('id'=>$data[$this->identifier]);
-
-        $rowArray['buttons'] = $this->renderButtons($this->_buttons, $data);
-
-        if ($this->itemOptions)
-            $rowArray['options']=$this->evaluateExpression($this->itemOptions,array('row'=>$row,'data'=>$data));
+        //if ($this->itemOptions)
+        //    $rowArray['options']=$this->evaluateExpression($this->itemOptions,['row'=>$row,'data'=>$data]);
 
         /*$buttons = $this->getButtons();
         if ($buttons && isset($buttons['row'])){
@@ -451,7 +398,7 @@ class SyGrid extends SyView
                 $rowArray['buttons'][] = $index;
             }
         }*/
-        return $rowArray;
+        return $row;
     }
 
     public function renderExport(){
@@ -467,20 +414,6 @@ class SyGrid extends SyView
             }
         }
         return $ret ? $ret : null;
-    }
-
-    /*public function getFormatter()
-    {
-        if($this->_formatter===null)
-            $this->_formatter=Yii::$app->formatter;
-        return $this->_formatter;
-    }*/
-
-    /**
-     * @param CFormatter $value the formatter instance
-     */
-    public function setFormatter($value){
-        $this->_formatter=$value;
     }
 
     public function filter($key){
@@ -501,7 +434,7 @@ class SyGrid extends SyView
                 'filter'=>Module::t('app', 'Filter'),
             ],
             'ajax'=>[
-                'url'=>Url::toRoute('sy/api/grid')
+                'url'=>Url::toRoute('actives/api/grid')
             ]
         ];
         return ';$.fn.sygrid.defaults('.json_encode($defaults).');';
