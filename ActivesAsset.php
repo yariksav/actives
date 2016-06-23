@@ -49,13 +49,13 @@ class ActivesAsset extends AssetBundle
         //'js/datepicker/bootstrap-datepicker.ru.min.js',
         'js/datetimepicker/js/bootstrap-datetimepicker.js',
         //'js/datetimepicker/js/locales/bootstrap-datetimepicker.ru.js',
-        'js/sy.utils.js',
-        'js/sy.dialog.js',
-        'js/sy.html.js',
+        //'js/sy.utils.js',
+        //'js/sy.dialog.js',
+        //'js/sy.html.js',
         'js/sy.alerts.js',
         'js/jquery.numeric.min.js',
-        'js/sy.grid.js',
-        'js/sy.context.js',
+        //'js/sy.grid.js',
+        //'js/sy.context.js',
         'js/sy.tree.js',
     ];
 
@@ -69,12 +69,11 @@ class ActivesAsset extends AssetBundle
     public function init(){
         //$this->js[] = 'js/locale/sy.locale.'.substr(\Yii::$app->language, 0, strpos(\Yii::$app->language, '_')).'.js';
         parent::init();
-        Module::registerTranslationMessages();
     }
 
     public function registerAssetFiles($view) {
         parent::registerAssetFiles($view);
-        $view->registerJs(Dialog::prepareJsDefaults(), View::POS_END);
-        $view->registerJs(Grid::prepareJsDefaults(), View::POS_END);
+        //$view->registerJs(Dialog::prepareJsDefaults(), View::POS_END);
+        //$view->registerJs(Grid::prepareJsDefaults(), View::POS_END);
     }
 }

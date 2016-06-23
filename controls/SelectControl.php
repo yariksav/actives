@@ -10,7 +10,7 @@ namespace yariksav\actives\controls;
 
 use yii\helpers\ArrayHelper;
 
-class SelectControl extends SelectionControl {
+class SelectControl extends CollectionControl {
 
     public $button;
     public $empty = false;
@@ -21,23 +21,26 @@ class SelectControl extends SelectionControl {
         $this->type = 'select';
     }
 
-    public function getSelection() {
-        if (is_callable($this->_selection)) {
-            $selection = call_user_func_array($this->_selection, [
+    public function getCollection() {
+        if (is_callable($this->_collection)) {
+            $collection = call_user_func_array($this->_collection, [
                 'data' => $this->_model,
-                'activeObject' => $this->_activeObject
+                'owner' => $this->owner
             ]);
+        } else if (is_array($this->_collection)){
+            $collection = $this->_collection;
         }
-        // render selection to proper format
+
+        // render collection to proper format
         if (isset($this->fields) && is_array($this->fields)) {
-            $selection = ArrayHelper::map(
-                $selection,
+            $collection = ArrayHelper::map(
+                $collection,
                 ArrayHelper::getValue($this->fields, 0, 'id'),
                 ArrayHelper::getValue($this->fields, 1, 'name'),
                 ArrayHelper::getValue($this->fields, 2)
             );
         }
-        return $selection;
+        return $collection;
     }
 
     /**

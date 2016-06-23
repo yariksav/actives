@@ -21,7 +21,7 @@ class ActionMgr extends CollectionMgr
         if (empty($params['class'])) {
             $params['class'] = Action::className();
         }
-        $obj = Yii::createObject($params, [$this->_activeObject]);
+        $obj = Yii::createObject($params, [$this->owner]);
         // Disable previous action events if exists
         if (isset($this->_collection[$name]) && $this->_collection[$name] instanceof DialogAction) {
             $this->_collection[$name]->disableEvents();

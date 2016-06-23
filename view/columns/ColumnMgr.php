@@ -38,7 +38,7 @@ class ColumnMgr extends CollectionMgr
             }
         }
         return Yii::createObject($params, [
-            $this->_activeObject
+            $this->owner
         ]);
 
 /*        $name = $params['name'];
@@ -49,7 +49,7 @@ class ColumnMgr extends CollectionMgr
         if (empty($params['class'])) {
             $params['class'] = Action::className();
         }
-        $obj = Yii::createObject($params, [$this->_activeObject]);
+        $obj = Yii::createObject($params, [$this->owner]);
         // Disable previous action events if exists
         if (isset($this->_collection[$name]) && $this->_collection[$name] instanceof DialogAction) {
             $this->_collection[$name]->disableEvents();
@@ -97,7 +97,7 @@ class ColumnMgr extends CollectionMgr
     {
         if(!preg_match('/^([\w\.]+)(:(\w*))?(:(.*))?$/',$text,$matches))
             throw new CException(Yii::t('zii','The column must be specified in the format of "Name:Type:Label", where "Type" and "Label" are optional.'));
-        $column = new DataColumn($this->_activeObject);
+        $column = new DataColumn($this->owner);
         $column->name=$matches[1];
         if(isset($matches[3]) && $matches[3]!=='')
             $column->type=$matches[3];

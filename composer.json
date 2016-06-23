@@ -1,32 +1,38 @@
 {
-    "name": "yariksav/yii2-actives",
-    "description": "Actives handler module for Yii2 (Dialogs, Grids, Trees, etc)",
-    "keywords": ["yii2", "dialogs", "yariksav"],
-    "type": "yii2-extension",
-    "license": "MIT",
-    "support": {
-        "issues": "https://github.com/yariksav/yii2-actives/issues?state=open",
-        "forum": "https://gitter.im/yariksav/yii2-actives",
-        "source": "https://github.com/yariksav/yii2-actives"
-    },
-    "authors": [
-        {
-            "name": "Savaryn Yaroslav",
-            "email": "yariksav@gmail.com",
-            "homepage": "https://github.com/yariksav"
-        }
-    ],
-    "minimum-stability": "dev",
-    "require": {
-        "yiisoft/yii2": "~2.0",
-        "rmrevin/yii2-fontawesome": "~2.13",
-        "bower-asset/font-awesome": "~4.5.0"
-    },
-    "require-dev": {
-    },
-    "autoload": {
-        "psr-4": {
-            "yariksav\\actives\\": ""
-        }
+  "name": "yariksav/yii2-actives",
+  "description": "Active controls handler module for Yii2 (Dialogs, Grids, Trees, etc)",
+  "keywords": [
+    "yii2",
+    "dialogs",
+    "yariksav"
+  ],
+  "type": "yii2-extension",
+  "license": "MIT",
+  "support": {
+    "issues": "https://github.com/yariksav/yii2-actives/issues?state=open",
+    "forum": "https://gitter.im/yariksav/yii2-actives",
+    "source": "https://github.com/yariksav/yii2-actives"
+  },
+  "authors": [
+    {
+      "name": "Savaryn Yaroslav",
+      "email": "yariksav@gmail.com",
+      "homepage": "https://github.com/yariksav"
     }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "yiisoft/yii2": "~2.0",
+    "rmrevin/yii2-fontawesome": "~2.13"
+  },
+  "require-dev": {
+  },
+  "autoload": {
+    "psr-4": {
+      "yariksav\\actives\\": ""
+    }
+  },
+  "extra": {
+    "bootstrap": "yariksav\\actives\\Bootstrap"
+  }
 }

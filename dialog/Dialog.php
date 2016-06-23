@@ -32,6 +32,7 @@ class Dialog extends ActiveObject {
     public $width = 500;
     public $name;
     public $control;
+    public $current;
 
     protected $_actions = [];
     protected $_action;
@@ -138,7 +139,7 @@ class Dialog extends ActiveObject {
 
     protected function onLoad(){
         if ($this->model === null)
-            throw new Exception(Module::t('app', 'Record not found'));
+            throw new Exception(Module::t('actives', 'Record not found'));
         $this->_controls->model = $this->model;
         $this->response->controls = $this->_controls->build();
         $this->addResponseOptions();
@@ -196,7 +197,10 @@ class Dialog extends ActiveObject {
         }
         $dialog = ActiveObject::createObject($config);
         $this->response = $dialog->run();
-        $this->response->class = $config['class'];
+        if (!$this->response->params) {
+            $this->response->params = new \stdClass();
+        }
+        $this->response->params->class = $config['class'];
     }
 
     public function getModel() {
@@ -212,7 +216,7 @@ class Dialog extends ActiveObject {
     protected function onControl() {
         $control = $this->_controls->get($this->control);
         if (!$control || !$control->visible || !$control->hasPermissions()) {
-            throw new Exception(Yii::t('app', 'Control "{0}" was not found', [$this->control]));
+            throw new Exception(Yii::t('actives', 'Control "{0}" was not found', [$this->control]));
         }
         $control->config = array_merge($control->config, $this->data, ['class' => $control->config['class']]);
         if ($control->requireModel) {
@@ -262,10 +266,10 @@ class Dialog extends ActiveObject {
     public static function prepareJsDefaults($scriptWrap = true){
         $defaults = [
             'labels'=>[
-                'close' => Module::t('app', 'Close'),
-                'cancel'=> Module::t('app', 'Cancel'),
-                'yes'   => Module::t('app', 'Yes'),
-                'no'    => Module::t('app', 'No'),
+                'close' => Yii::t('actives', 'Close'),
+                'cancel'=> Yii::t('actives', 'Cancel'),
+                'yes'   => Yii::t('actives', 'Yes'),
+                'no'    => Yii::t('actives', 'No'),
             ],
             'ajax'=>[
                 'url'=>Url::toRoute('actives/api')

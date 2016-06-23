@@ -17,25 +17,25 @@ class Action extends ProtectedObject
     public $data;
     public $icon;
     public $iconright;
-
-    private $_activeObject;
+    public $options;
+    private $owner;
     private $title;
 
-    function __construct($activeObject, $config = []) {
+    function __construct($owner, $config = []) {
         parent::__construct($config);
-        $this->_activeObject = $activeObject;
+        $this->owner = $owner;
     }
 
     public function getVisible() {
         if (is_callable($this->_visible)) {
-            $this->_visible = call_user_func_array($this->_visible, ['activeObject' => $this->_activeObject]);
+            $this->_visible = call_user_func_array($this->_visible, ['owner' => $this->owner]);
         }
         return $this->_visible && $this->hasPermissions();
     }
 
     public function getTitle() {
         if (!$this->title) {
-            return Yii::t('app', ucfirst($this->name));
+            return Yii::t('actives', ucfirst($this->name));
         }
         return $this->title;
     }
@@ -55,6 +55,9 @@ class Action extends ProtectedObject
         if ($this->iconright) {
             $res['iconright'] = $this->iconright;
         }
+        if ($this->options) {
+            $res['options'] = $this->options;
+        }
         return $res;
     }
 
@@ -64,25 +67,25 @@ class Action extends ProtectedObject
             return;
         }
         if ($this->on) {
-            $this->_activeObject->on($this->name, $this->on);
+            $this->owner->on($this->name, $this->on);
         }
         if ($this->after) {
-            $this->_activeObject->on('after' . $this->name, $this->after);
+            $this->owner->on('after' . $this->name, $this->after);
         }
         if ($this->before) {
-            $this->_activeObject->on('before' . $this->name, $this->before);
+            $this->owner->on('before' . $this->name, $this->before);
         }
     }
 
     public function disableEvents() {
         if ($this->on) {
-            $this->_activeObject->off($this->name, $this->on);
+            $this->owner->off($this->name, $this->on);
         }
         if ($this->after) {
-            $this->_activeObject->off('after' . $this->name, $this->after);
+            $this->owner->off('after' . $this->name, $this->after);
         }
         if ($this->before) {
-            $this->_activeObject->off('before' . $this->name, $this->before);
+            $this->owner->off('before' . $this->name, $this->before);
         }
     }
 }

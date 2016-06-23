@@ -9,17 +9,17 @@
 namespace yariksav\actives\controls;
 
 
-class SelectionControl extends Control {
+class CollectionControl extends Control {
 
     public $fields;
-    protected $_selection;
+    protected $_collection;
 
-    public function getSelection() {
-        return $this->_selection;
+    public function getCollection() {
+        return $this->_collection;
     }
 
-    public function setSelection($value) {
-        $this->_selection = $value;
+    public function setCollection($value) {
+        $this->_collection = $value;
     }
 
     /**
@@ -27,7 +27,7 @@ class SelectionControl extends Control {
      */
     public function build() {
         $control = parent::build();
-        $control['selection'] = $this->selection;
+        $control['collection'] = $this->collection;
         return $control;
     }
 }

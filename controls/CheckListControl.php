@@ -10,7 +10,7 @@ namespace yariksav\actives\controls;
 
 use yii\helpers\ArrayHelper;
 
-class CheckListControl extends SelectionControl
+class CheckListControl extends CollectionControl
 {
 
 
@@ -23,25 +23,25 @@ class CheckListControl extends SelectionControl
         $this->type = 'checklist';
     }
 
-    public function getSelection() {
-        $selection= [];
-        if (is_callable($this->_selection)) {
-            $selection = call_user_func_array($this->_selection, [
+    public function getCollection() {
+        $collection = [];
+        if (is_callable($this->_collection)) {
+            $collection = call_user_func_array($this->_collection, [
                 'data' => $this->_model,
-                'activeObject' => $this->_activeObject
+                'owner' => $this->owner
             ]);
         }
-        // render selection to proper format
+        // render collection to proper format
         if (isset($this->fields) && is_array($this->fields)) {
-            $selection = ArrayHelper::map(
-                $selection,
+            $collection = ArrayHelper::map(
+                $collection,
                 ArrayHelper::getValue($this->fields, 0, 'id'),
                 ArrayHelper::getValue($this->fields, 1, 'name'),
                 ArrayHelper::getValue($this->fields, 2)
             );
         }
         //TODO Add render INFO variable
-        return $selection;
+        return $collection;
     }
 
 

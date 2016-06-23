@@ -15,16 +15,16 @@ class CollectionMgr extends Object
 {
     protected $_current;
     protected $_collection;
-    protected $_activeObject;
+    protected $owner;
 
-    function __construct($activeObject, $config = []) {
+    function __construct($owner, $config = []) {
         parent::__construct($config);
-        $this->_activeObject = $activeObject;
+        $this->owner = $owner;
     }
 
     protected function createItem($item) {
         return Yii::createObject($item, [
-            $this->_activeObject
+            $this->owner
         ]);
     }
     /**

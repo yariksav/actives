@@ -17,6 +17,12 @@ class PluginMgr extends CollectionMgr
         'search' => 'yariksav\actives\view\plugins\SearchPlugin',
         'refresh' => 'yariksav\actives\view\plugins\RefreshPlugin',
         'pager' => 'yariksav\actives\view\plugins\PagerPlugin',
+        'pageSize' => 'yariksav\actives\view\plugins\PageSizePlugin',
+        'loader' => 'yariksav\actives\view\plugins\PagerPlugin',
+        'refresh' => 'yariksav\actives\view\plugins\Plugin',
+        'manage' => 'yariksav\actives\view\plugins\Plugin',
+        'filter' => 'yariksav\actives\view\plugins\FilterPlugin',
+
         'columnMenu' => 'yariksav\actives\view\plugins\ColumnMenuPlugin',
         'contextMenu' => 'yariksav\actives\view\plugins\ContextMenuPlugin',
     ];
@@ -43,7 +49,7 @@ class PluginMgr extends CollectionMgr
         }
 
         return Yii::createObject($params, [
-            $this->_activeObject
+            $this->owner
         ]);
     }
 

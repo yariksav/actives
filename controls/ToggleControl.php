@@ -9,7 +9,7 @@
 namespace yariksav\actives\controls;
 
 
-class ToggleControl extends SelectionControl {
+class ToggleControl extends CollectionControl {
 
     public function init() {
         $this->type = 'toggler';

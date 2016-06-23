@@ -9,16 +9,18 @@ class Plugin extends ProtectedObject
 {
     public $name;
     public $type;
-    public $_activeObject;
+    public $owner;
 
-    function __construct($activeObject, $config = []) {
+    function __construct($owner, $config = []) {
         parent::__construct($config);
-        $this->_activeObject = $activeObject;
+        $this->owner = $owner;
 
     }
 
     public function build() {
-        return ['name'=>$this->name];
+        return [
+            'name'=>$this->name
+        ];
     }
 
 }

@@ -23,7 +23,7 @@ class StepMgr extends CollectionMgr
     public $stepRemember = false;
     protected $currentStep;
 
-    function __construct($activeObject, $config = []) {
+    function __construct($owner, $config = []) {
         $conf = [
             'current'=>ArrayHelper::getValue($config, 'current'),
             'next'=>ArrayHelper::getValue($config, 'next'),
@@ -31,7 +31,7 @@ class StepMgr extends CollectionMgr
         unset($config['current'], $config['next']);
 
         $conf['config'] = $config;
-        parent::__construct($activeObject, $conf);
+        parent::__construct($owner, $conf);
     }
 
     protected function createObject($item) {
@@ -68,8 +68,8 @@ class StepMgr extends CollectionMgr
             }
             $step = null;
             if ($this->stepRemember) {
-                $path = get_class($this->_activeObject).':step';
-                $step = Yii::$app->session->get(get_class($this->_activeObject).':step');
+                $path = get_class($this->owner).':step';
+                $step = Yii::$app->session->get(get_class($this->owner).':step');
             }
             if (empty($this->_collection[$step])) {
                 // get first step
@@ -88,7 +88,7 @@ class StepMgr extends CollectionMgr
 
     protected function rememberStep(){
         if ($this->stepRemember && $this->_current) {
-            Yii::$app->session->set(get_class($this->_activeObject).':step', $this->_current);
+            Yii::$app->session->set(get_class($this->owner).':step', $this->_current);
         }
     }
 

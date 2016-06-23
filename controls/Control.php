@@ -46,17 +46,17 @@ class Control extends Component
     protected $_name;
     protected $_type;
     protected $_value;
-    protected $_activeObject;
+    protected $owner;
     protected $_model;
 
     /**
      * Constructor.
-     * @param ActiveObject $activeObject the active object whom belongs this control
+     * @param ActiveObject $owner the active object whom belongs this control
      * @param array $config configurations to be applied to the newly created query object
      */
-    function __construct($activeObject, $config = []) {
+    function __construct($owner, $config = []) {
         parent::__construct($config);
-        $this->_activeObject = $activeObject;
+        $this->owner = $ownert;
 
     }
 
@@ -76,7 +76,7 @@ class Control extends Component
         if (is_callable($this->_value)) {
             $this->_value = call_user_func_array($this->_value, [
                 'data' => $this->_model,
-                'activeObject' => $this->_activeObject
+                'owner' => $this->owner
             ]);
         } else if ($this->_model instanceof yii\db\BaseActiveRecord && $this->_model->hasAttribute($name)) {
             $this->_value = $this->_model->$name;
@@ -94,7 +94,7 @@ class Control extends Component
         if (is_callable($this->_visible)) {
             $this->_visible = call_user_func_array($this->_visible, [
                 'data' => $this->_model,
-                'activeObject' => $this->_activeObject
+                'owner' => $this->owner
             ]);
         }
         return $this->_visible;
@@ -112,7 +112,7 @@ class Control extends Component
         if (is_callable($this->_label)) {
             $this->_label = call_user_func_array($this->_label, [
                 'data' => $this->_model,
-                'activeObject' => $this->_activeObject
+                'owner' => $this->owner
             ]);
         } else if (!$this->_label) {
             if ($this->_model instanceof Model) {

@@ -48,7 +48,7 @@ class Tree extends ActiveView
         $this->response->url = Url::toRoute('actives/api/grid');
         //$this->response->selected = $this->request['selected'];
         $this->response->labels = array(
-            'refresh'=>\Yii::t('app', 'Refresh'),
+            'refresh'=>\Yii::t('actives', 'Refresh'),
         );
         $this->response->contextmenu = $this->contextMenu;
         $this->response->buttons = $this->renderButtons($this->buttons);

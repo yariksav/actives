@@ -36,12 +36,12 @@ class Column extends ProtectedObject
     //public $footerOptions = [];
 
     //-------------
-    protected $activeObject;
+    protected $owner;
 
 
-    function __construct($activeObject, $config = []) {
+    function __construct($owner, $config = []) {
         parent::__construct($config);
-        $this->activeObject = $activeObject;
+        $this->owner = $owner;
     }
 
     public function init()
@@ -85,7 +85,7 @@ class Column extends ProtectedObject
 
     public function renderHeader()
     {
-        $provider = $this->activeObject->dataProvider;
+        $provider = $this->owner->dataProvider;
         $header = $this->header;
         if ($header === null) {
             if ($provider instanceof ActiveDataProvider && $provider->query instanceof ActiveQueryInterface) {

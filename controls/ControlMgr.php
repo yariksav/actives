@@ -30,15 +30,16 @@ class ControlMgr extends CollectionMgr {
         'dialog' => 'yariksav\actives\controls\DialogControl',
         'tree' => 'yariksav\actives\controls\TreeControl',
         'tag' => 'yariksav\actives\controls\Control',
+        'auth' => 'yariksav\actives\controls\Control',
     ];
 
     protected $_required = [];
     protected $_model;
     protected $_labels = [];
 
-    public function __construct($activeObject, $model = null){
+    public function __construct($owner, $model = null){
         $this->_model = $model;
-        $this->_activeObject= $activeObject;
+        $this->owner= $owner;
 
         // get required fields from model
         if ($this->_model instanceof Model){
@@ -96,7 +97,7 @@ class ControlMgr extends CollectionMgr {
             }
         }
         return Yii::createObject($params, [
-            $this->_activeObject,
+            $this->owner,
             $this->_model
         ]);
     }

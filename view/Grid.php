@@ -12,50 +12,48 @@ use yariksav\actives\controls\ControlMgr;
 use yariksav\actives\view\columns\ColumnMgr;
 use yariksav\actives\view\buttons\ButtonMgr;
 use yariksav\actives\view\plugins\PluginMgr;
+//use yariksav\actives\view\filters\FilterMgr;
+//use yariksav\actives\view\exports\ExportMgr;
 
 
 class Grid extends ActiveView
 {
     //!!
     public $sort;
-    public $page;
+    public $page = 1;
     public $newcount;
     //!!
-    const C_GRID_SELECTION =1;
+//    const C_GRID_SELECTION =1;
 
 
     public $filter = [];
     protected $filterPrepared = [];
-    protected $filters;
+    //protected $filters;
     public $title;
-    //protected $dateFilter;
-
-    //public $columnSelection = false;
-    public $refreshButton = true;
     public $saveState = false;
 
-    public $dataProvider;
-    //public $blankDisplay='&nbsp;';
-    //public $nullDisplay='&nbsp;';
+    //protected $dateFilter;
 
-    protected $rowCount = 10;
+
+    public $dataProvider;
+
+    public $pageSize = 20;
     protected $identifier = 'id';
     protected $tree;
-
-
-    public $itemOptions;
-    protected  $storage;
-
 
     // new!
     protected $_columns;
     protected $_buttons;
     protected $_plugins;
+    protected $_filters;
+    protected $_exports;
 
     function __construct($config = []) {
         $this->_columns = new ColumnMgr($this);
         $this->_buttons = new ButtonMgr($this);
         $this->_plugins = new PluginMgr($this);
+        $this->_filters = new ControlMgr($this);
+        //$this->_exports = new ExportMgr($this);
         parent::__construct($config);
     }
 
@@ -71,13 +69,17 @@ class Grid extends ActiveView
         $this->_plugins->load($value);
     }
 
+    public function setFilters($value) {
+        $this->_filters->load($value);
+    }
+
+//    public function setExports($value) {
+//        $this->_exports->load($value);
+//    }
+
     protected function _init(){
-
-
-
         $this->init();
-        $this->rowCount = $this->getState('rowCount', $this->rowCount);
-
+        $this->pageSize = $this->getState('pageSize', $this->pageSize);
         $this->filter = $this->evaluateExpression($this->filter);
 
         // Save filters for recovery state
@@ -90,12 +92,10 @@ class Grid extends ActiveView
                     //$this->filter = array_merge($this->filter, $rememberedFilter);
             }
             if ($this->request['method'] == 'load') {
-                $this->setState('filters', $this->filter);
+                //$this->setState('filters', $this->filter);
             }
         }
 
-
-        //$this->searchPhrase = isset($this->request['searchPhrase']) ? $this->request['searchPhrase'] : false;
         //$this->filter = isset($this->request['filter']) ? $this->request['filter'] : array();
 /*		if (isset($this->request['data'])) {
             $this->dataProvider = $this->request['data'];
@@ -130,7 +130,7 @@ class Grid extends ActiveView
     public function data(){}
 
 
-    public function filters(){}
+    //public function filters(){}
     public function export(){}
 
     /*
@@ -139,8 +139,14 @@ class Grid extends ActiveView
 
     protected function prepareData(){
         $model = isset($this->request['model']) ? $this->request['model'] : null;
-        $data = isset($this->request['data']) ? $this->evaluateExpression($this->request['data'], ['data'=>$model, 'grid'=>$this]) : $this->data();
-        $this->dataProvider = ($data instanceof ActiveDataProvider || $data instanceof ArrayDataProvider)? $data : new ArrayDataProvider(['allModels'=>$data]);
+
+        $data = $this->data ? $this->evaluateExpression($this->data, ['data'=>$model, 'grid'=>$this]) : $this->data();
+
+        if ($data instanceof ActiveDataProvider || $data instanceof ArrayDataProvider) {
+            $this->dataProvider = $data;
+        } else {
+            $this->dataProvider = new ArrayDataProvider(['allModels'=>$data]);
+        }
     }
 
     public function actionInit(){
@@ -164,10 +170,8 @@ class Grid extends ActiveView
         //$this->renderFooter();
     }
 
-    public function actionSetCount(){
-        if (isset($this->request['newcount'])) {
-            $this->setState('rowCount', $this->rowCount = $this->request['newcount']);
-        }
+    public function actionPageSize(){
+        $this->setState('pageSize', $this->pageSize);
     }
 
     public function renderTitle(){
@@ -207,8 +211,9 @@ class Grid extends ActiveView
             $sort[] = ($value == 'desc' ? '-' : '').$key;
         }
         $sort = implode(',', $sort);
-        if ($sort)
+        if ($sort) {
             $_GET['sort'] = $sort;
+        }
 
         /*if (isset($this->request['sort'])) {
             $this->dataProvider->setSort([]);
@@ -220,12 +225,13 @@ class Grid extends ActiveView
 
     protected function setPagination(){
         if ($this->dataProvider) {
-/*            if (!$this->pagination || $this->rowCount < 0) {
-                $this->dataProvider->pagination = false;
-            } else if ($this->dataProvider->pagination) {
-                $this->dataProvider->pagination->pageSize = $this->rowCount;
-                $this->dataProvider->pagination->page = isset($this->request['page']) ? $this->request['page'] - 1 : 0;
-            }*/
+            //if (!$this->pagination || $this->pageSize < 0) {
+            //    $this->dataProvider->pagination = false;
+            //} else
+            if ($this->pageSize > 0 && $this->dataProvider->pagination) {
+                $this->dataProvider->pagination->pageSize = $this->pageSize;
+                $this->dataProvider->pagination->page = $this->page - 1 ;
+            }
         }
     }
 
@@ -291,22 +297,21 @@ class Grid extends ActiveView
         $this->response->name = $this->name;
         $this->response->url = Url::toRoute('/actives/api/grid');
 
-        //$this->response->columnSelection = $this->columnSelection;
-        $this->response->refreshButton = $this->refreshButton;
-        $this->response->plugins = $this->_plugins->build();
-
 
         //$this->response->export = $this->renderExport();
 
         $this->response->columns = $this->_columns->build();
         $this->response->buttons = $this->_buttons->build();
+        $this->response->plugins = $this->_plugins->build();
+        $this->response->filters = $this->_filters->build();
+
         $this->response->affect = $this->affect;
         //renderButtons($this->_buttons);
 
-        if ($this->filters) {
-            $helper = new ControlMgr($this->filter);
+//        if ($this->filters) {
+//            $helper = new ControlMgr($this->filter);
             //!!! $this->response->filters = $helper->buildControls($this->filters);
-        }
+//        }
         //$this->response->filter = $this->filter;
         /*$this->response->filter = $this->filter;
         if ($this->tree){
@@ -334,11 +339,11 @@ class Grid extends ActiveView
             }
             $pagination = $this->dataProvider->getPagination();
             if ($pagination) {
-                $total = $this->dataProvider->getTotalCount();
-                $this->response->data->total = (int)$total;
                 $this->response->data->page = $pagination->page + 1;
-                $this->response->data->rowCount = (int)$this->rowCount;
+                $this->response->data->pageSize = (int)$this->pageSize;
             }
+            $total = $this->dataProvider->getTotalCount();
+            $this->response->data->total = (int)$total;
         }
 
     }
@@ -423,15 +428,15 @@ class Grid extends ActiveView
     public static function prepareJsDefaults($scriptWrap = true){
         $defaults = [
             'labels'=>[
-                'all'=>Module::t('app', 'All'),
-                'infos'=>Module::t('app', 'Showing {start} to {end} of {total} entries'),
-                'infoTotal'=>Module::t('app', 'Entries: {total}'),
-                'loading'=>Module::t('app', 'Loading...'),
-                'noResults'=>Module::t('app', 'No results found'),
-                'refresh'=>Module::t('app', 'Refresh'),
-                'search'=>Module::t('app', 'Search'),
-                'exports'=>Module::t('app', 'Export to file'),
-                'filter'=>Module::t('app', 'Filter'),
+                'all'=>Yii::t('actives', 'All'),
+                'infos'=>Yii::t('actives', 'Showing {start} to {end} of {total} entries'),
+                'infoTotal'=>Yii::t('actives', 'Entries: {total}'),
+                'loading'=>Yii::t('actives', 'Loading...'),
+                'noResults'=>Yii::t('actives', 'No results found'),
+                'refresh'=>Yii::t('actives', 'Refresh'),
+                'search'=>Yii::t('actives', 'Search'),
+                'exports'=>Yii::t('actives', 'Export to file'),
+                'filter'=>Yii::t('actives', 'Filter'),
             ],
             'ajax'=>[
                 'url'=>Url::toRoute('actives/api/grid')

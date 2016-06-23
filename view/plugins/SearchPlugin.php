@@ -11,7 +11,7 @@ class SearchPlugin extends Plugin
 
     public function build() {
         if (!$this->text) {
-            $this->text = Yii::t('app', 'Search');
+            $this->text = Yii::t('actives', 'Search');
         }
         return [
             'name'=>$this->name,

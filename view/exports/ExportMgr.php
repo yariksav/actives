@@ -1,6 +1,6 @@
 <?php
 
-namespace yariksav\actives\view\buttons;
+namespace yariksav\actives\view\filters;
 
 use yii;
 use yii\base;
@@ -9,7 +9,7 @@ use yariksav\actives\base\CollectionMgr;
 use yariksav\actives\base\Component;
 
 
-class ButtonMgr extends CollectionMgr
+class ExportMgr extends CollectionMgr
 {
 
     public static $builtInColumns = [
