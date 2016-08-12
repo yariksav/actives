@@ -6,45 +6,41 @@ use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 use yariksav\actives\base\ActiveObject;
 use yariksav\actives\base\Exception;
+use yariksav\actives\view\plugins\PluginMgr;
 
 abstract class ActiveView extends ActiveObject
 {
+    protected $_plugins;
+
     public $method = 'init'; //!!!!!!!!!!!!!!!!
 
     protected $request;
-    public $system = [];
-    protected $data;
-    protected $scripts;
-    public $searchPhrase = false;
-
-    public $name;
-    public $visible = true;
     protected $response;
+    protected $data;
 
-/*    function __construct($request, $config=[]){
-        parent::__construct($config);
-
-        $this->response = new \stdClass();
-        if (!isset($request['method']))
-            $request['method'] = $this->method ? $this->method : 'init';
-
-        $this->name = str_replace('\\', '_', get_called_class());
-        $this->response->class = $request['class'];
-
-        $this->request = $request;
-        $class = get_called_class();
-        if ($this->request) foreach($this->request as $name=>$value){
-            if (property_exists($class, $name) && !in_array($name, ['system']))
-                $this->$name=$value;
-        }
-        $this->_init();
-        $this->renderAction();
-    }*/
+    public $visible = true;
 
     function __construct($config = []) {
         $this->response = new \stdClass();
-        $this->_init();
+        $this->_plugins = new PluginMgr($this);
+
+        $this->beforeInit();
         parent::__construct($config);
+    }
+
+    public function setPlugins($value) {
+        $this->_plugins->load($value);
+        //$this->_plugins->values($value);
+    }
+
+//    public function setPluginsInit($value) {
+//        return $this->_plugins;
+//        $this->_plugins->values($value);
+//    }
+
+
+    protected function renderOptions() {
+        $this->response->plugins = $this->_plugins->build();
     }
 
     public function run() {
@@ -58,36 +54,6 @@ abstract class ActiveView extends ActiveObject
         $this->renderAction();
         return $this->response;
     }
-
-    /*public static function getInstance($options){
-        if (is_string($options)){
-            $class = $options;
-            $options = ['class'=>$class];
-        }
-        else if (is_array($options)){
-            $class = isset($options['class']) ? $options['class'] : 'SyGrid';
-        }
-        else
-            throw new Exception('Object params is not defined');
-
-        if (strpos($class, '.') !== false) {
-            Yii::import('application.classes.'.$class);
-            $class = str_replace('.', '', strrchr($class, '.'));
-        }
-
-        $object = new $class($options);
-        if (!$object instanceof self)
-            throw new Exception($class.' has incorrect instance');
-        return $object;
-    }
-
-    public static function widget($options, $view){
-        $instance = self::createInstance($options);
-        $response = $instance->getResponse();
-        if ($view)
-            $response = $instance->_wrap($response, $view);
-        return $response;
-    }*/
 
     public static function widget($config){
         $instance = self::createObject($config);
@@ -106,34 +72,20 @@ abstract class ActiveView extends ActiveObject
         if (!method_exists($this, $action))
             throw new Exception('Method '.$action.' not exists');
 
-        if ($action == 'actionExport'){
+        if ($this->method == 'export'){
             $this->$action();
             return null;
-        }
-        else {
-            if (\Yii::$app->request->isAjax)
+        } else {
+            if (\Yii::$app->request->isAjax) {
                 header('Content-type: application/json');
+            }
             $this->$action();
         }
     }
 
-    protected function _wrap($data, $view){
-        return json_encode($data);
-    }
-
-
-
-    abstract protected function _init();
-    abstract protected function data();
-
-    public function getResponse(){
-        $response = $this->response;
-        if (isset($this->system)){
-            $response->system = base64_encode(json_encode($this->system));
-        }
-        return $response;
-    }
-
+//    protected function _wrap($data, $view){
+//        return json_encode($data);
+//    }
 
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace yariksav\actives\view\filters;
+namespace yariksav\actives\view\exports;
 
 use yii;
 use yii\base;
@@ -13,7 +13,8 @@ class ExportMgr extends CollectionMgr
 {
 
     public static $builtInColumns = [
-        'row' => 'yariksav\actives\view\buttons\RowButton'
+        'excel' => 'yariksav\actives\view\exports\ExcelExport',
+        'csv' => 'yariksav\actives\view\exports\CsvExport'
     ];
 
     protected function createObject($params) {
@@ -41,41 +42,14 @@ class ExportMgr extends CollectionMgr
         ]);
     }
 
-    protected function prepareButtons(){
-        $this->_buttons = isset($this->buttons) ? $this->evaluateExpression($this->buttons, ['grid'=>$this]) : $this->buttons();
-    }
+//    protected function prepareButtons(){
+//        $this->_buttons = isset($this->buttons) ? $this->evaluateExpression($this->buttons, ['grid'=>$this]) : $this->buttons();
+//    }
 
     public function build() {
-        return $this->renderButtons();
+        return $this->render();
     }
 
-    public function buildRow($data) {
-        return $this->renderButtons($data);
-    }
 
-    protected function renderButtons($model = false){
-        $result = [];
-        if ($this->_collection) foreach ($this->_collection as $name=>$button) {
-
-            if ($model === false && $button instanceof RowButton) {
-                continue;
-            }
-            if ($model !== false && !($button instanceof RowButton)) {
-                continue;
-            }
-
-            if (!$button->isVisible($model) || !$button->hasPermissions()) {
-                continue;
-            }
-
-            $btn = $button->build($model);
-
-            if (isset($button->buttons)){
-                $btn['buttons'] = $this->renderButtons($button->buttons, $data);
-            }
-            $result[$name] = $btn;
-        }
-        return $result;
-    }
 
 }

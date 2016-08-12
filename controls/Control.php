@@ -42,11 +42,12 @@ class Control extends Component
      * @var string|Closure the caption or label of the control
      * @see getLabel
      */
+    protected $owner;
     protected $_label;
+    protected $_text;
     protected $_name;
     protected $_type;
     protected $_value;
-    protected $owner;
     protected $_model;
 
     /**
@@ -54,9 +55,10 @@ class Control extends Component
      * @param ActiveObject $owner the active object whom belongs this control
      * @param array $config configurations to be applied to the newly created query object
      */
-    function __construct($owner, $config = []) {
+    function __construct($owner, $model = null, $config = []) {
         parent::__construct($config);
         $this->owner = $ownert;
+        $this->_model = $model;
 
     }
 
@@ -108,23 +110,23 @@ class Control extends Component
         $this->_type = $value;
     }
 
-    public function getLabel() {
-        if (is_callable($this->_label)) {
-            $this->_label = call_user_func_array($this->_label, [
+    public function getText() {
+        if (is_callable($this->_text)) {
+            $this->_text = call_user_func_array($this->_text, [
                 'data' => $this->_model,
                 'owner' => $this->owner
             ]);
-        } else if (!$this->_label) {
+        } else if (!$this->_text) {
             if ($this->_model instanceof Model) {
                 $labels = $this->_model->attributeLabels();
-                $this->_label = ArrayHelper::getValue($labels, $this->_name);
+                $this->_text = ArrayHelper::getValue($labels, $this->_name);
             }
         }
-        return $this->_label;
+        return $this->_text;
     }
 
-    public function setLabel($value) {
-        $this->_label = $value;
+    public function setText($value) {
+        $this->_text = $value;
     }
 
     /**
@@ -149,8 +151,9 @@ class Control extends Component
             'name' => $this->_name,
             'value' => $this->value,
         ];
-        if ($this->label) {
-            $control['label'] = $this->label;
+        $text = $this->text;
+        if ($text) {
+            $control['text'] = $text;
         }
         if ($this->options) {
             $control['options'] = $this->options;

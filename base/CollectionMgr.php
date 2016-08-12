@@ -46,6 +46,10 @@ class CollectionMgr extends Object
                         $collection[$key] = $existedItem;
                     }
                 }
+
+//            } else if ($item === '-') {
+//                unset($this->_collection[$name]);
+
             } else if (is_string($item) && is_int($name)) {
                 if(!preg_match('/^([\w\.]+)(:(\w*))?(:(.*))?$/', $item, $matches)) {
                     throw new CException(Yii::t('zii', 'The column must be specified in the format of "Name:Type:Label", where "Type" and "Label" are optional.'));
@@ -67,7 +71,9 @@ class CollectionMgr extends Object
                     $instance = $this->_collection[$name];
                     Yii::configure($instance, $item);
                 } else { // create new component
-                    $item['name'] = $name;
+                    if (empty($item['name'])) {
+                        $item['name'] = $name;
+                    }
                     $instance = $this->createObject($item);
                 }
 
@@ -105,5 +111,18 @@ class CollectionMgr extends Object
 
     public function setCurrent($value) {
         $this->_current = $value;
+    }
+
+    protected function render(){
+        $result = [];
+        if ($this->_collection) foreach ($this->_collection as $name=>$item) {
+
+            if (!$item->visible || !$item->hasPermissions()) {
+                continue;
+            }
+
+            $result[$name] = $item->build();
+        }
+        return $result;
     }
 }

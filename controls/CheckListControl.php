@@ -53,10 +53,10 @@ class CheckListControl extends CollectionControl
         if ($value && isset($this->fields['selected'])) {
             $value = array_values(ArrayHelper::getColumn($value, $this->fields['selected']));
         }
-            if (!$value)
+        if (!$value) {
             $value = $this->default;
+        }
         return $value;
     }
-
 
 }

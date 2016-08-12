@@ -23,7 +23,8 @@ class ApiController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'index' => ['post'],
+                    'index' => ['post', 'get'],
+                    'export' => ['get']
                 ],
             ],
         ];
@@ -40,9 +41,14 @@ class ApiController extends Controller
         $response = [];
         try{
             $data = Yii::$app->request->post('data');
+            if ($data === null) {
+                $data = $_GET;
+            } else {
+                $data = json_decode($data, true);
+            }
 
             //$data = strtr($data, array('#u002F'=>'/', '#u002B'=>'+', '#u0026'=>'&', '#u0025'=>'%'));
-            $data = json_decode($data, true);
+
             unset($data['permissions'], $data['actions'], $data['controls']);
 
             $dialog = ActiveObject::createObject($data);
@@ -90,12 +96,11 @@ class ApiController extends Controller
         $data = json_decode($data, true);
         $grid = ActiveObject::createObject($data);
         $grid->run();
-//        ActiveObject::createObject($data);
-
         Yii::$app->response->format = 'json';
         return $grid->response;
+    }
 
-        //if ($grid->response != null)
-        //	echo json_encode($grid->response);
+    public function actionExport() {
+
     }
 }

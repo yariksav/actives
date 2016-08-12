@@ -6,20 +6,36 @@ use yii;
 class ManagerGrid extends Grid
 {
 
-    function init() {
-        parent::init();
+    function beforeInit() {
+        parent::beforeInit();
         $this->plugins = [
-            'manage',
-            'sort',
-            'search',
-            'pager',
-            'pageSize',
-            'contextMenu',
-            'columnMenu',
+            'sort'=>[
+                'saveState'=>true
+            ],
+//            'manage',
+//            'contextMenu',
+//            'columnMenu',
+            'pagination',
             'loader',
             'refresh',
-            'filter'
         ];
     }
 
 }
+
+//
+//'export' => [
+//    'type' => 'export',
+//    'collection'=> [
+//        'xls'=>[
+//            'type'=>'excel',
+//            'text'=>'Excel',
+//            'file'=>'report.xls'
+//        ],
+//        'csv'=>[
+//            'type'=>'csv',
+//            'text'=>'Csv',
+//            'file'=>'report.csv'
+//        ]
+//    ]
+//],

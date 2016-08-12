@@ -10,14 +10,12 @@ class SearchPlugin extends Plugin
     public $characters = 2;
 
     public function build() {
-        if (!$this->text) {
-            $this->text = Yii::t('actives', 'Search');
-        }
-        return [
-            'name'=>$this->name,
-            'text'=>$this->text,
+        $res = parent::build();
+        return array_merge($res, [
+            'text'=>$this->text ? : Yii::t('actives', 'Search'),
+            'value'=>$this->value,
             'characters' => $this->characters,
             'delay' => $this->delay
-        ];
+        ]);
     }
 }
