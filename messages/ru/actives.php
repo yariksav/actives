@@ -3,8 +3,10 @@
 return [
 
     'Show <span></span> elements'=>'Показывать по <span></span> записей',
-
+    'Please type your search query here'=>'Введите текст для поиска',
     'Record not found'=>'Запись не найдена',
+    'Please select' => 'Необходимо выбрать',
+
     'Show'=>'Показать',
     'View'=>'Просмотреть',
     'Error'=>'Ошибка',

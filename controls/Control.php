@@ -25,13 +25,14 @@ class Control extends Component
     use PermissionTrait;
     use VisibleTrait;
 
+    public $config = [];
     public $save;
     public $afterSave;
     public $default;
     public $validate;
     public $data;
-
     public $options;
+    public $isAjaxLoad = false;
 
     /**
      * @var boolean Is model riquired for build control data. It needs for some active controls as self update logic
@@ -57,7 +58,7 @@ class Control extends Component
      */
     function __construct($owner, $model = null, $config = []) {
         parent::__construct($config);
-        $this->owner = $ownert;
+        $this->owner = $owner;
         $this->_model = $model;
 
     }
@@ -158,7 +159,11 @@ class Control extends Component
         if ($this->options) {
             $control['options'] = $this->options;
         }
-        return $control;
+        return array_merge($control, $this->load());
+    }
+
+    public function load() {
+        return [];
     }
 
     public function update($value) {

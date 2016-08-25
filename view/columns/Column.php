@@ -85,9 +85,9 @@ class Column extends ProtectedObject
 
     public function renderHeader()
     {
-        $provider = $this->owner->dataProvider;
+        $provider = $this->owner->provider;
         $header = $this->header;
-        if ($header === null) {
+        if ($header === null && $provider) {
             if ($provider instanceof ActiveDataProvider && $provider->query instanceof ActiveQueryInterface) {
                 /* @var $model Model */
                 $model = new $provider->query->modelClass;
@@ -125,15 +125,15 @@ class Column extends ProtectedObject
         return $column;
     }
 
-    public function renderDataCell($row, $data){
+    public function renderDataCell($model, $key, $index){
         if($this->value!==null) {
             $value = call_user_func_array($this->value, [
-                'data' => $data,
+                'data' => $model,
                 'row' => $row,
                 'columnData' => $this->data
             ]);
         } elseif($this->name!==null) {
-            $value = ArrayHelper::getValue($data, $this->name);
+            $value = ArrayHelper::getValue($model, $this->name);
         }
         if ($this->format){
             $function = is_array($this->format) ? ArrayHelper::getValue($this->format, 0) : $this->format;

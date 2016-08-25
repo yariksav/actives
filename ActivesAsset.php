@@ -48,6 +48,7 @@ class ActivesAsset extends AssetBundle
         //'js/datepicker/bootstrap-datepicker.js',
         //'js/datepicker/bootstrap-datepicker.ru.min.js',
         'js/datetimepicker/js/bootstrap-datetimepicker.js',
+        'js/locationpicker.js',
         //'js/datetimepicker/js/locales/bootstrap-datetimepicker.ru.js',
         //'js/sy.utils.js',
         //'js/sy.dialog.js',

@@ -14,4 +14,12 @@ class ToggleControl extends CollectionControl {
     public function init() {
         $this->type = 'toggler';
     }
+
+    public function build() {
+        $ret = parent::build();
+        if ($ret['value'] === null && $ret['collection']) {
+            $ret['value'] = array_keys($ret['collection'])[0];
+        }
+        return $ret;
+    }
 }

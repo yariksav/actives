@@ -5,24 +5,24 @@ namespace yariksav\actives\view\plugins;
 use yii;
 use yii\base;
 use yii\base\Object;
-use yariksav\actives\base\StageCollection;
+use yariksav\actives\base\Collection;
 use yariksav\actives\base\Component;
 
 
-class PluginMgr extends StageCollection
+class PluginMgr extends Collection
 {
 
     public static $builtInPlugins = [
-        'pagination' => 'yariksav\actives\view\plugins\Pagination',
-        'sort' =>       'yariksav\actives\view\plugins\SortPlugin',
-        'search' =>     'yariksav\actives\view\plugins\SearchPlugin',
-        'refresh' =>    'yariksav\actives\view\plugins\RefreshPlugin',
         'loader' =>     'yariksav\actives\view\plugins\Plugin',
         'refresh' =>    'yariksav\actives\view\plugins\Plugin',
-        'manage' =>     'yariksav\actives\view\plugins\Plugin',
-        'filter' =>     'yariksav\actives\view\plugins\FilterPlugin',
-        'export' =>     'yariksav\actives\view\plugins\Plugin',
 
+        'pagination' => 'yariksav\actives\view\plugins\Pagination',
+        'sort' =>       'yariksav\actives\view\plugins\Sort',
+        'search' =>     'yariksav\actives\view\plugins\Search',
+        'filter' =>     'yariksav\actives\view\plugins\Filter',
+        'export' =>     'yariksav\actives\view\plugins\Export',
+
+        'manage' =>     'yariksav\actives\view\plugins\BaseMenu',
         'columnMenu' => 'yariksav\actives\view\plugins\ColumnMenuPlugin',
         'contextMenu' => 'yariksav\actives\view\plugins\ContextMenuPlugin',
     ];
@@ -70,21 +70,4 @@ class PluginMgr extends StageCollection
             }
         }
     }
-
-//    public function setInit($values) {
-//        if ($values) foreach ($values as $key => $value) {
-//            if (isset($this->_collection[$key])) {
-//                $plugin = $this->_collection[$key];
-//                $plugin->value = $value;
-//            }
-//        }
-//    }
-//    public function values($values) {
-//        if ($values) foreach ($values as $key => $value) {
-//            if (isset($this->_collection[$key])) {
-//                $plugin = $this->_collection[$key];
-//                $plugin->value = $value;
-//            }
-//        }
-//    }
 }

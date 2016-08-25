@@ -13,8 +13,8 @@ class ExportMgr extends CollectionMgr
 {
 
     public static $builtInColumns = [
-        'excel' => 'yariksav\actives\view\exports\ExcelExport',
-        'csv' => 'yariksav\actives\view\exports\CsvExport'
+        'excel' => 'yariksav\actives\view\exports\Excel',
+        'csv' => 'yariksav\actives\view\exports\Csv'
     ];
 
     protected function createObject($params) {
@@ -23,7 +23,7 @@ class ExportMgr extends CollectionMgr
         }
 
         if (empty($params['type']) && empty($params['class'])) {
-            $params['class'] = Button::className();
+            $params['type'] = $params['name'];
         }
 
         if (isset($params['type'])) {

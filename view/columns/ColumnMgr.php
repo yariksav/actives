@@ -14,7 +14,8 @@ class ColumnMgr extends CollectionMgr
 
     public static $builtInColumns = [
         'status' => 'yariksav\actives\view\columns\StateColumn',
-        'date' => 'yariksav\actives\view\columns\DateColumn'
+        'date' => 'yariksav\actives\view\columns\DateColumn',
+        'serial' => 'yariksav\actives\view\columns\SerialColumn'
     ];
 
     protected function createObject($params) {
@@ -139,10 +140,10 @@ class ColumnMgr extends CollectionMgr
         $this->setState('columnsState', json_encode($this->request['columns']));
     }
 
-    public function buildRow($row, $data) {
+    public function buildRow($model, $key, $index) {
         $result = [];
         if ($this->_collection) foreach($this->_collection as $column) {
-            $result[$column->name] = $column->renderDataCell($row, $data);
+            $result[$column->name] = $column->renderDataCell($model, $key, $index);
         }
         return $result;
     }

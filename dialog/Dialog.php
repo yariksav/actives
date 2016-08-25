@@ -11,64 +11,56 @@ use yii\web\HttpException;
 use yariksav\actives\Module;
 use yariksav\actives\base\ActiveObject;
 use yariksav\actives\base\Exception;
-use yariksav\actives\base\PermissionTrait;
-use yariksav\actives\base\VisibleTrait;
 use yariksav\actives\controls\ControlMgr;
 use yariksav\actives\controls\Control;
 use yariksav\actives\action\ActionMgr;
 
 
-class Dialog extends ActiveObject {
-
-    use PermissionTrait;
-    use VisibleTrait;
+class Dialog extends BaseDialog {
 
     public $confirm = [];
-    public $data = false;
+
     public $filter;
-    public $id;
     public $inputs;
     public $title;
-    public $width = 500;
     public $name;
     public $control;
-    public $current;
 
+    protected $_data = false;
     protected $_actions = [];
-    protected $_action;
-    protected $_config;
+
     protected $_controls = [];
     protected $_validation = [];
 
-    protected $response;
     protected $options;
-    protected $isNewRecord = false;
 
     function __construct($config = []) {
-        $this->id = ArrayHelper::getValue($config, 'id');
-        $this->isNewRecord = !$this->id;
 
-        $this->response = new \stdClass();
-        $this->response->params = new \stdClass();
-
-        $this->_config = $config;
         $this->_controls = new ControlMgr($this);
+
         $this->_actions = new ActionMgr($this);
-        $this->loadSystemActions();
+        $this->_actions->load([
+            'load' => [
+                'on' => [$this, 'onLoad']
+            ],
+            'control' => [
+                'on' => [$this, 'onControl']
+            ]
+        ]);
+
         $this->options = [
             'closeOnEscape' => true,
             'isModal' => true,
         ];
 
-        $this->_init();
+
         parent::__construct($config);
 
-
-        $this->_actions->current = $this->action ? : 'load';
+        //$this->_actions->current = $this->action ? : 'load';
     }
 
     protected function _init(){
-
+        ;
     }
 
     public function getIsNewRecord(){
@@ -83,13 +75,8 @@ class Dialog extends ActiveObject {
      * @return mixed
      */
     public function run() {
-        if (!$this->visible) {
-            if (Yii::$app->user->isGuest) {
-                throw new HttpException(401, Yii::t('app.error', 'Please login for this request.'));
-            } else {
-                throw new HttpException(423, Yii::t('app.error', 'You are not authorized to perform this action.'));
-            }
-        }
+        parent::run();
+
         if ($this->_actions->current) {
             if (!$this->_actions->current->visible || !$this->_actions->current->hasPermissions()) {
                 throw new HttpException(423, Yii::t('app.error', 'You are not authorized to perform this action.'));
@@ -99,11 +86,11 @@ class Dialog extends ActiveObject {
             $this->trigger('after' . $this->_actions->current->name);
         }
 
-        if ($this->id) {
-            $this->response->params->id = $this->id;
+        if ($this->key) {
+            $this->response->key = $this->key;
         }
-        if ($this->affect) {
-            $this->response->affect = $this->affect;
+        if ($this->emits) {
+            $this->response->emits = $this->emits;
         }
         return $this->response;
     }
@@ -114,33 +101,31 @@ class Dialog extends ActiveObject {
      */
     public function setActions(array $value) {
         $this->_actions->load($value);
-        $this->loadSystemActions();
     }
 
-    protected function loadSystemActions() {
-        $this->_actions->loadIfNotExists(
-            [
-                'load' => [
-                    'on' => [$this, 'onLoad']
-                ],
-                'control' => [
-                    'on' => [$this, 'onControl']
-                ]
-            ]
-        );
+    public function emit($name, $key = null, $action = null) {
+        if (!$key) {
+            $key = $this->key;
+        }
+        if (!$action) {
+            if ($this->_actions->getCurrent()->name === 'save') {
+                $action = $this->isNewRecord ? 'insert' : 'update';
+            } else {
+                $action = $this->_action;
+            }
+        }
+        $this->emits[] = ['name'=>$name, 'key'=>$key, 'action'=>$action];
     }
 
-    public function setAffect($name, $id, $action) {
-        $this->affect[] = ['name'=>$name, 'id'=>$id, 'type'=>$action];
-    }
     public function setControls($value) {
         $this->_controls->load($value);
     }
 
     protected function onLoad(){
-        if ($this->model === null)
-            throw new Exception(Module::t('actives', 'Record not found'));
-        $this->_controls->model = $this->model;
+        if ($this->getModel() === null) {
+            throw new Exception(Yii::t('actives', 'Record not found'));
+        }
+        $this->_controls->model = $this->getModel();
         $this->response->controls = $this->_controls->build();
         $this->addResponseOptions();
     }
@@ -149,12 +134,11 @@ class Dialog extends ActiveObject {
         $this->response->actions = $this->_actions->links();
         $this->response->options = $this->options;
         $this->response->title = $this->title;
-        $this->response->width = $this->width;
-
+        $this->response->width = $this->width ? : 500;
     }
 
     protected function prepare(){
-        $this->_controls->model = $this->model;
+        $this->_controls->model = $this->getModel();
         $this->_controls->update($this->inputs);
         $this->verify();
     }
@@ -171,12 +155,10 @@ class Dialog extends ActiveObject {
 
     protected function confirm($message, $buttons = null){
         $id = md5($message);
-        //if (!$buttons)
-        //    $buttons= ['yes'=>'Yes'];
-        if (empty($this->confirm[$id]['result'])){
+        if (empty($this->confirm[$id])){
             throw new ConfirmException($message, $id, $buttons);
         }
-        return (bool)$this->confirm[$id]['result'];
+        return (bool)ArrayHelper::getValue($this->confirm[$id], 'result');
     }
 
     protected function message($message){
@@ -189,10 +171,10 @@ class Dialog extends ActiveObject {
         if (empty($config['action'])) {
             $config['action'] = 'load';
         }
-        if (empty($config['id'])) {
-            $config['id'] = $this->id;
+        if (empty($config['key'])) {
+            $config['key'] = $this->key;
         }
-        if (empty($config['action'])) {
+        if (empty($config['filter'])) {
             $config['filter'] = $this->filter;
         }
         $dialog = ActiveObject::createObject($config);
@@ -203,26 +185,37 @@ class Dialog extends ActiveObject {
         $this->response->params->class = $config['class'];
     }
 
+    public function setData($value) {
+        $this->_data = $value;
+    }
+
+    public function getData() {
+        return $this->_data;
+    }
+
     public function getModel() {
-        if (!$this->data && $this->_actions->current->data) {
-            $this->data = $this->_actions->current->data;
+        if (!$this->_data && $this->_actions->current->data) {
+            $this->_data = $this->_actions->current->data;
         }
-        if (is_callable($this->data)) {
-            $this->data = call_user_func_array($this->data, []);
+        if (is_callable($this->_data)) {
+            $this->_data = call_user_func_array($this->_data, []);
         }
-        return $this->data;
+        return $this->_data;
     }
 
     protected function onControl() {
-        $control = $this->_controls->get($this->control);
+        $name = ArrayHelper::remove($this->control, 'name');
+
+        $control = $this->_controls->get($name);
+
         if (!$control || !$control->visible || !$control->hasPermissions()) {
-            throw new Exception(Yii::t('actives', 'Control "{0}" was not found', [$this->control]));
+            throw new Exception(Yii::t('actives', 'Control "{0}" was not found', [$name]));
         }
-        $control->config = array_merge($control->config, $this->data, ['class' => $control->config['class']]);
+        $control->config = array_merge(['method'=>''], $control->config, $this->control, ['class' => $control->config['class']]);
         if ($control->requireModel) {
-            $control->model = $this->model;
+            $control->model = $this->getModel();
         }
-        $this->response = $control->build();
+        $this->response->control = $control->load();
     }
 
     protected function deleteInTransaction($model) {
@@ -259,8 +252,8 @@ class Dialog extends ActiveObject {
     }
 
     public function setAction($value) {
+        parent::setAction($value);
         $this->_actions->current = $value;
-        $this->_action = $value;
     }
 
     public static function prepareJsDefaults($scriptWrap = true){

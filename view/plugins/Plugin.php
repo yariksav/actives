@@ -10,10 +10,9 @@ class Plugin extends ProtectedObject
     public $name;
     public $type;
     public $owner;
-    public $apply; //test
-    public $collection;
+    public $apply;
+    public $remember = false;
 
-    public $saveState = false;
     protected $_value;
     protected $_provider;
 
@@ -33,14 +32,12 @@ class Plugin extends ProtectedObject
 
     public function setProvider($provider) {
         $this->_provider = $provider;
-        if (is_callable($this->apply) && $this->value !== null) {
-            call_user_func($this->apply, $provider, $this->value);
-        }
+        $this->renderApply();
     }
 
     public function getValue() {
         // todo if need strict initial data, use  && $this->_value === null
-        if ($this->saveState && $this->owner->method === 'init') {
+        if ($this->remember && $this->owner->method === 'init') {
             $this->_value = $this->owner->getState($this->name, $this->_value);
         }
         return $this->_value;
@@ -48,8 +45,14 @@ class Plugin extends ProtectedObject
 
     public function setValue($value) {
         $this->_value = $value;
-        if ($this->saveState && $this->owner->method === 'load') {
+        if ($this->remember && $this->owner->method === 'load') {
             $this->owner->setState($this->name, $value);
+        }
+    }
+
+    public function renderApply() {
+        if (is_callable($this->apply) && $this->_provider && $this->getValue()) {
+            call_user_func_array($this->apply, [$this->_provider, $this->_value]);
         }
     }
 

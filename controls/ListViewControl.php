@@ -11,15 +11,16 @@ namespace yariksav\actives\controls;
 use yii;
 use yariksav\actives\base\ActiveObject;
 
-class GridControl extends Control {
+class ListViewControl extends Control {
 
+    public $config = [];
     public $requireModel = true;
 
-    public function load() {
+    public function build() {
+        $control = parent::build();
         $instance = ActiveObject::createObject($this->config);
         $instance->run();
-        return [
-            'data'=>$instance->getResponse()
-        ];
+        $control['data'] = $instance->getResponse();
+        return $control;
     }
 }

@@ -10,32 +10,11 @@ class ManagerGrid extends Grid
         parent::beforeInit();
         $this->plugins = [
             'sort'=>[
-                'saveState'=>true
+                'remember'=>true
             ],
-//            'manage',
-//            'contextMenu',
-//            'columnMenu',
             'pagination',
             'loader',
             'refresh',
         ];
     }
-
 }
-
-//
-//'export' => [
-//    'type' => 'export',
-//    'collection'=> [
-//        'xls'=>[
-//            'type'=>'excel',
-//            'text'=>'Excel',
-//            'file'=>'report.xls'
-//        ],
-//        'csv'=>[
-//            'type'=>'csv',
-//            'text'=>'Csv',
-//            'file'=>'report.csv'
-//        ]
-//    ]
-//],

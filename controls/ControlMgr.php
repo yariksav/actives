@@ -6,9 +6,9 @@ namespace yariksav\actives\controls;
 use yii;
 use yii\helpers\ArrayHelper;
 use yii\base\Model;
-use yariksav\actives\base\CollectionMgr;
+use yariksav\actives\base\Collection;
 
-class ControlMgr extends CollectionMgr {
+class ControlMgr extends Collection {
 
     /**
      * @var array list of built-in controls (name => class or configuration)
@@ -22,15 +22,19 @@ class ControlMgr extends CollectionMgr {
         'select' => 'yariksav\actives\controls\SelectControl',
         'toggler' => 'yariksav\actives\controls\ToggleControl',
         'checklist' => 'yariksav\actives\controls\CheckListControl',
+        'selectize' => 'yariksav\actives\controls\SelectizeControl',
+        'autocomplete' => 'yariksav\actives\controls\AutocompleteControl',
         'password' => [
             'class' => 'yariksav\actives\controls\Control',
             'type' => 'password',
         ],
         'grid' => 'yariksav\actives\controls\GridControl',
+        'listview' => 'yariksav\actives\controls\ListViewControl',
         'dialog' => 'yariksav\actives\controls\DialogControl',
         'tree' => 'yariksav\actives\controls\TreeControl',
         'tag' => 'yariksav\actives\controls\Control',
         'auth' => 'yariksav\actives\controls\Control',
+        'googleMaps' => 'yariksav\actives\controls\GoogleMapsControl',
     ];
 
     protected $_required = [];

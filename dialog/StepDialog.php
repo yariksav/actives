@@ -10,10 +10,7 @@ use yariksav\actives\base\VisibleTrait;
 use yariksav\actives\base\Exception;
 use yii\web\HttpException;
 
-class StepDialog extends ActiveObject {
-
-    use PermissionTrait;
-    use VisibleTrait;
+class StepDialog extends BaseDialog {
 
     // TODO: set visibility behavior by this types
     const DIALOG_TYPE_BASE = 1;
@@ -21,40 +18,22 @@ class StepDialog extends ActiveObject {
     const DIALOG_TYPE_GRIDS = 3;
 
     protected $_steps;
-    public $action;
     public $type = self::DIALOG_TYPE_BASE;
-    public $response;
-    public $id;
-    public $width;
-    protected $isNewRecord;
 
-    protected $stepNumeraion = false;
-    protected $stepRemember = false;
-//    protected $stepNavigation =
+    function __construct($config = []) {
+        $this->_steps = Yii::createObject(array_merge($config, [
+            'class' => StepMgr::className()
+        ]), [$this]);
 
-    function __construct($config = []){
-        $this->response = new \stdClass();
-        $this->action =  ArrayHelper::getValue($config, 'action', 'load');
-        $this->id =  ArrayHelper::getValue($config, 'id');
-        $this->isNewRecord = !$this->id;
-        $this->_steps = Yii::createObject(array_merge($config, ['class' => StepMgr::className()]), [$this]);
-        $this->_init();
-        $this->_steps->stepNumeration = $this->stepNumeraion;
-        $this->_steps->stepRemember = $this->stepRemember;
-    }
-
-    protected function _init(){
-
+        parent::__construct([
+            'key' => ArrayHelper::getValue($config, 'key'),
+            'action' => ArrayHelper::getValue($config, 'action', 'load')
+        ]);
     }
 
     public function run() {
-        if (!$this->visible) {
-            if (Yii::$app->user->isGuest) {
-                throw new HttpException(401, Yii::t('app.error', 'Please login for this request.'));
-            } else {
-                throw new HttpException(423, Yii::t('app.error', 'You are not authorized to perform this action.'));
-            }
-        }
+        parent::run();
+
         $method = 'on'.ucfirst($this->action);
         if (method_exists($this, $method)) {
             $this->$method();
@@ -65,12 +44,15 @@ class StepDialog extends ActiveObject {
         return $this->response;
     }
 
-
     public function renderOptions(){
         $this->response->steps = $this->_steps->links();
-        //$this->response->stepNavigation = $this->stepNavigation;
         $this->response->current = $this->_steps->current->name;
-        //$this->response->stepNumeraion = $this->stepNumeraion;
+        $this->response->stepNavigation = $this->_steps->navigation;
+        $this->response->stepNumeration = $this->_steps->numeration;
+    }
+
+    public function getSteps() {
+        return $this->_steps;
     }
 
     public function setSteps(array $value) {
@@ -82,10 +64,10 @@ class StepDialog extends ActiveObject {
 
     protected function onLoad(){
         $step = $this->_steps->current;
-        if (!$step->id) {
-            $step->id = $this->id;
+        if (!$step->key) {
+            $step->key = $this->key;
         }
-        if ($this->width) {
+        if (!$step->width && $this->width) {
             $step->width = $this->width;
         }
         $step->action = 'load';
@@ -116,7 +98,7 @@ class StepDialog extends ActiveObject {
         $step = $this->_steps->current;
         $step->action = 'save';
         $this->response = $step->run();
-        $this->id = $step->id;
+        $this->key = $step->key;
     }
 
 

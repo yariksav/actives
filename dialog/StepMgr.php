@@ -11,17 +11,20 @@ namespace yariksav\actives\dialog;
 use yii;
 use yii\base\Exception;
 use yii\base\Object;
-use yariksav\actives\base\CollectionMgr;
-use yariksav\actives\base\ActiveObject;
 use yii\helpers\ArrayHelper;
+use yariksav\actives\base\Collection;
+use yariksav\actives\base\ActiveObject;
 
-class StepMgr extends CollectionMgr
+class StepMgr extends Collection
 {
-    public $config = [];
+    protected $_config = [];
     public $next;
-    public $stepNumeration = false;
-    public $stepRemember = false;
+    public $numeration = false;
+    public $navigation = true;
+    public $remember = false;
+
     protected $currentStep;
+    protected $_current;
 
     function __construct($owner, $config = []) {
         $conf = [
@@ -29,8 +32,11 @@ class StepMgr extends CollectionMgr
             'next'=>ArrayHelper::getValue($config, 'next'),
         ];
         unset($config['current'], $config['next']);
+        $this->_config = $config;
 
-        $conf['config'] = $config;
+        if (in_array($this->_config['action'], ['navigation', 'next', 'previous'])) {
+            $this->_config['action'] = 'load';
+        }
         parent::__construct($owner, $conf);
     }
 
@@ -41,8 +47,8 @@ class StepMgr extends CollectionMgr
             throw new \Exception('Please get the name for step');
         }
 
-        $step = ActiveObject::createObject(array_merge($item, $this->config));
-        if ($step && $step->visible) {
+        $step = ActiveObject::createObject(array_merge($item, $this->_config));
+        if ($step && $step->visible) { //todo add  && $step->privilege
             return $step;
         }
     }
@@ -52,7 +58,7 @@ class StepMgr extends CollectionMgr
         $index = 0;
         foreach($this->_collection as $name => $step) {
             $index++;
-            $title = ($this->stepNumeration ? $index . '. ' : '').($step->title ? $step->title : ucfirst($step->name));
+            $title = ($this->numeration ? $index . '. ' : '').($step->title ? $step->title : ucfirst($step->name));
             $links[$name] = [
                 'title' => $title,
                 'current' => $name === $this->_current
@@ -67,7 +73,7 @@ class StepMgr extends CollectionMgr
                 return $this->currentStep = $this->_collection[$this->_current];
             }
             $step = null;
-            if ($this->stepRemember) {
+            if ($this->remember) {
                 $path = get_class($this->owner).':step';
                 $step = Yii::$app->session->get(get_class($this->owner).':step');
             }
@@ -87,7 +93,7 @@ class StepMgr extends CollectionMgr
     }
 
     protected function rememberStep(){
-        if ($this->stepRemember && $this->_current) {
+        if ($this->remember && $this->_current) {
             Yii::$app->session->set(get_class($this->owner).':step', $this->_current);
         }
     }
@@ -127,22 +133,21 @@ class StepMgr extends CollectionMgr
         $currentIndex = 0;
         foreach ($this->_collection as $name=>$step) {
             if ($currentIndex > 0 && $prev) {
-                $step->actions = [
+                $step->setActions([
                     'previous'=>[
                         'type'=>'button',
+                        '~position'=>0,
                         'icon'=>'fa fa-caret-left'
-                    ],
-                    '*'
-                ];
+                    ]
+                ]);
             }
             if ($currentIndex < $count - 1 && $next) {
-                $step->actions = [
-                    '*',
+                $step->setActions([
                     'next'=>[
                         'type'=>'button',
                         'iconright'=>'fa fa-caret-right'
                     ]
-                ];
+                ]);
             }
             $currentIndex++;
         }

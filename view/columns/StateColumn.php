@@ -30,8 +30,8 @@ class StateColumn extends Column
         return parent::renderFilterContent();
     }
 
-    public function renderDataCell($row,$data){
-        $value = isset($this->value) ? call_user_func_array($this->value, ['data'=>$data]) : ArrayHelper::getValue($data,$this->name);
+    public function renderDataCell($model, $key, $index){
+        $value = isset($this->value) ? call_user_func_array($this->value, ['data'=>$model]) : ArrayHelper::getValue($model,$this->name);
         if ($value === false && isset($this->values['false']))
             $value = 'false';
         if ($value === true && isset($this->values['true']))

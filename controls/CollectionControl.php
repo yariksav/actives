@@ -25,9 +25,9 @@ class CollectionControl extends Control {
     /**
      * @inheritdoc
      */
-    public function build() {
-        $control = parent::build();
-        $control['collection'] = $this->collection;
-        return $control;
+    public function load() {
+        return [
+            'collection'=>$this->getCollection()
+        ];
     }
 }

@@ -7,7 +7,8 @@ use yii;
 class ActiveObject extends Component
 {
     protected $name;
-    protected $affect = [];
+    protected $emits = [];
+    protected $listens = [];
 
     protected function beforeInit() {}
 
