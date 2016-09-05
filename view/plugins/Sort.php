@@ -20,6 +20,7 @@ class Sort extends Plugin
         if ($this->apply) {
             parent::setProvider($query);
         } else {
+            //TODO перенести на  public function setAttributeOrders($attributeOrders, $validate = true) в версии ншш 2.0.10
 //            if (is_array($this->value) && $query instanceof ActiveQuery) {
 //                foreach ($this->value as $key => $value) {
 //                    $query->addOrderBy(new Expression($key . ' ' . $value));

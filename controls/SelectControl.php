@@ -13,7 +13,12 @@ use yii\helpers\ArrayHelper;
 class SelectControl extends CollectionControl {
 
     public $button;
+
+    /*
+     * @var bool is select can work with empty result
+     */
     public $empty = false;
+
     /**
      * @inheritdoc
      */
@@ -21,6 +26,9 @@ class SelectControl extends CollectionControl {
         $this->type = 'select';
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getCollection() {
         if (is_callable($this->_collection)) {
             $collection = call_user_func_array($this->_collection, [

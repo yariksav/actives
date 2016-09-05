@@ -8,8 +8,6 @@
 
 namespace yariksav\actives\controls;
 
-
-
 use yii;
 use Closure;
 use yii\base\Model;
@@ -32,10 +30,10 @@ class Control extends Component
     public $validate;
     public $data;
     public $options;
-    public $isAjaxLoad = false;
 
     /**
-     * @var boolean Is model riquired for build control data. It needs for some active controls as self update logic
+     * @var boolean Is model riquired for build control data.
+     * It needs for some active controls as self update logic
      */
     public $requireModel = false;
 
@@ -143,8 +141,8 @@ class Control extends Component
     }
 
     /**
-     * Build control output array.
-     * @return array the control data
+     * Builds full control config array.
+     * @return array the control config
      */
     public function build() {
         $control = [
@@ -162,6 +160,10 @@ class Control extends Component
         return array_merge($control, $this->load());
     }
 
+    /**
+     * Builds only control data.
+     * @return array the control data
+     */
     public function load() {
         return [];
     }
@@ -171,18 +173,34 @@ class Control extends Component
         $name = $this->_name;
         $model = $this->_model;
 
+//        $callback = function ($event) use ($model, $value) {
+//            call_user_func_array($this->afterSave, [
+//                'model' => $model,
+//                'value' => $value,
+//                'event' => $event
+//            ]);
+//        };
+//
+//        // Register After Save
+//        if (is_callable($this->afterSave) && $model instanceof Model) {
+//            if ($model->getIsNewRecord()) {
+//                $model->on($model->getIsNewRecord() ? yii\db\ActiveRecord::EVENT_AFTER_INSERT : yii\db\ActiveRecord::EVENT_AFTER_UPDATE, $callback);
+//            }
+//        }
+
+        // Call Save
         if (is_callable($this->save)) {
             call_user_func_array($this->save, [
-                'value' => $value,
-                'model' => $model
+                'model' => $model,
+                'value' => $value
             ]);
         } else {
 
             if (isset($model)) {
                 if ($model instanceof Model) {
-                    if ($model->isAttributeActive($name)) {
+                    //if ($model->isAttributeActive($name)) {
                         $model->$name = $value;
-                    }
+                    //}
                 } else {
                     $model[$name] = $value;
                 }

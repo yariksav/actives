@@ -8,6 +8,7 @@
 
 namespace yariksav\actives\controls;
 
+use Closure;
 use Yii;
 use yii\base\InvalidParamException;
 use yii\base\ViewContextInterface;
@@ -18,14 +19,52 @@ class SelectizeControl extends SelectControl implements ViewContextInterface
 {
     use ViewerTrait;
 
+    /*
+     * @var string sets name of key field. If not asset - collection must be key=>value associative array
+     */
     public $key;
+
+    /**
+     * @var string|\Closure sets the name of item field, or render in closure.
+     */
     public $item;
+
+    /**
+     * @var string|\Closure sets the view path for rendering item in template, or render in closure.
+     */
     public $itemView;
+    /*
+     * @var bool|integer Check is this control has multiple.
+     * If type is int and grater then one - sets maximum of possible element
+     */
     public $multiple = false;
+    /*
+     * @var string text of input plaseholder
+     */
     public $placeholder;
+    /*
+     * @var array additional config ptions of selectize component
+     */
     public $elementOptions;
+
+    /**
+     * @var string|\Closure the group field in model or value from function
+     */
     public $group;
+
+    /**
+     * @var array|\Closure variation of groups. Returns associative key=>value array
+     */
     public $groups;
+
+    /**
+     * @var array list of selectize plugins:
+     * "remove_button" - adds classic a classic remove button to each item for behavior
+     * "restore_on_backspace" - Press the [backspace] key and go back to editing the item without it being fully removed.
+     * "drag_drop" - Adds drag-and-drop support for easily rearranging selected items. Requires jQuery UI (sortable).
+     * "optgroup_columns" - A plugin by Simon Hewitt that renders optgroups horizontally with convenient left/right keyboard navigation.
+     */
+    public $plugins;
 
     /**
      * @inheritdoc
@@ -58,7 +97,8 @@ class SelectizeControl extends SelectControl implements ViewContextInterface
             'multiple' => $this->multiple,
             'placeholder' => $this->placeholder,
             'groups' => $this->renderGroups(),
-            'elementOptions' => $this->elementOptions
+            'elementOptions' => $this->elementOptions,
+            'plugins'=>$this->plugins
         ]);
         return $control;
     }
@@ -67,7 +107,7 @@ class SelectizeControl extends SelectControl implements ViewContextInterface
      * Renders all data models.
      * @return array the rendering result
      */
-    public function renderItems($collection) {
+    protected function renderItems($collection) {
         $rows = [];
         foreach ($collection as $index => $model) {
             $rows[] = $this->renderItem($model, $index);
@@ -79,7 +119,7 @@ class SelectizeControl extends SelectControl implements ViewContextInterface
      * Render model item.
      * @return array the rendering result
      */
-    public function renderItem($model, $index) {
+    protected function renderItem($model, $index) {
         $key = $this->key ? $model[$this->key] : $index;
         $ret = [
             'key'=>$key
@@ -122,7 +162,7 @@ class SelectizeControl extends SelectControl implements ViewContextInterface
         return realpath(dirname((new \ReflectionClass(get_class($this->owner)))->getFileName()));
     }
 
-    public function renderGroups() {
+    protected function renderGroups() {
         if (is_array($this->groups)) {
             $groups = $this->groups;
         } else if (is_callable($this->groups)) {

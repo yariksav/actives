@@ -28,13 +28,16 @@ class ControlMgr extends Collection {
             'class' => 'yariksav\actives\controls\Control',
             'type' => 'password',
         ],
-        'grid' => 'yariksav\actives\controls\GridControl',
-        'listview' => 'yariksav\actives\controls\ListViewControl',
+        'grid' => 'yariksav\actives\controls\ActiveControl',
+        'tree' => 'yariksav\actives\controls\ActiveControl',
+        'listview' => 'yariksav\actives\controls\ActiveControl',
         'dialog' => 'yariksav\actives\controls\DialogControl',
         'tree' => 'yariksav\actives\controls\TreeControl',
         'tag' => 'yariksav\actives\controls\Control',
         'auth' => 'yariksav\actives\controls\Control',
         'googleMaps' => 'yariksav\actives\controls\GoogleMapsControl',
+        'fileUpload' => 'yariksav\actives\controls\FileUploadControl',
+        'imageUpload' => 'yariksav\actives\controls\ImageUploadControl',
     ];
 
     protected $_required = [];
@@ -135,122 +138,29 @@ class ControlMgr extends Collection {
 
 /*
 
+    case 'number':
+        $ctrl = ['name' => $name, 'value' => $value, 'label' => $label];
+        break;
 
-    public function renderControl($control)
-    {
-        if (!ArrayHelper::getValue($control, 'visible', true))
-            return;
+    case 'treebox':
+        $options = isset($control['options']) ? $this->evaluateExpression($control['options'], ['data' => $model]) : [];
+        $options['selected'] = $value;
+        $options['contextmenu'] = false;
+        $options['class'] = $control['class'];
+        $data = SyActiveObject::createInstance($options);
 
-        $ctrl = null;
-        $value = ArrayHelper::getValue($control, 'value');
+        $ctrl = ['name' => $name, 'value' => $value, 'label' => $label, 'data' => $data->response];
+        break;
 
-        $name = ArrayHelper::getValue($control, 'name', ArrayHelper::getValue($control, 'n'));
-        $type = strtolower(ArrayHelper::getValue($control, 'type', ArrayHelper::getValue($control, 't')));
-        $model = $this->_model;
+    case 'tree':
+        $control['model']=$model;
+        if (empty($control['class']))
+            $control['class'] = 'Sy'.ucfirst($type);
+        $data = SyActiveObject::createInstance($control);
+        $ctrl = ['name' => $name, 'value' => $value, 'data' => $data->getResponse()];
+        if (isset($control['container']))
+            $ctrl['container'] = $control['container'];
+        break;
 
-
-
-        $label = ArrayHelper::getValue($control, 'l', ArrayHelper::getValue($control, 'label', ArrayHelper::getValue($this->_labels, $name)));
-        if (is_callable($label)){
-            $label = $this->evaluateExpression($label, ['data' => $model]);
-        }
-        // if value is function
-        if ($value && !is_array($value) && is_callable($value)) {
-            $value = $this->evaluateExpression($value, ['data' => $model]);
-        }
-
-        if (!$value) {
-            $value = isset($model) && isset($model[$name]) ? $model[$name] : (isset($control['default']) ? $control['default'] : null);
-            //if (property_exists($model, $name))
-            //	$value = $model->{$name};
-        }
-
-        $enable = ArrayHelper::getValue($control, 'enable', true);
-
-        $htmlOptions = ArrayHelper::getValue($control, 'htmlOptions', []);
-        if (!$enable)
-            $htmlOptions['disabled'] = true;
-        if (isset($control['title']))
-            $htmlOptions['title'] = $control['title'];
-
-        switch ($type) {
-            case 'tag':
-                $ctrl = ['tag' => ArrayHelper::getValue($control, 'tag'), 'options' => ArrayHelper::getValue($control, 'options')];
-                break;
-
-            case 'number':
-                $ctrl = ['name' => $name, 'value' => $value, 'label' => $label];
-                break;
-
-            case 'treebox':
-                $options = isset($control['options']) ? $this->evaluateExpression($control['options'], ['data' => $model]) : [];
-                $options['selected'] = $value;
-                $options['contextmenu'] = false;
-                $options['class'] = $control['class'];
-                $data = SyActiveObject::createInstance($options);
-
-                $ctrl = ['name' => $name, 'value' => $value, 'label' => $label, 'data' => $data->response];
-                break;
-
-            case 'grid':
-            case 'tree':
-                $control['model']=$model;
-                if (empty($control['class']))
-                    $control['class'] = 'Sy'.ucfirst($type);
-                $data = SyActiveObject::createInstance($control);
-                $ctrl = ['name' => $name, 'value' => $value, 'data' => $data->getResponse()];
-                if (isset($control['container']))
-                    $ctrl['container'] = $control['container'];
-                break;
-
-            case 'autocomplete':
-                if (isset($control['fields']) && $value)
-                    $value = ArrayHelper::getValue(self::prepareDataByFields($value, $control['fields']), 0);
-
-                $ctrl = ['name' => $name, 'value' => $value, 'label' => $label];
-                if (isset($control['fields'][0]))
-                    $ctrl['key'] = $control['fields'][0];
-                break;
-
-            case 'html':
-                $ctrl = ['html' => $value];
-                break;
-
-            case 'line':
-                $ctrl = [];
-                break;
-
-            default:
-                $ctrl = ['name' => $name, 'value' => $value, 'label' => $label];
-                foreach($control as $key=>$item){
-                    if (!in_array($key, ['type', 'name', 'value', 'label', 'controls']))
-                        $ctrl[$key] = $item;
-                }
-                break;
-        }
-
-
-        if ($ctrl !== null) {
-            $ctrl['type'] = $type;
-            if ($label)
-                $ctrl['label'] = $label;
-            if ($htmlOptions) {
-                $ctrl['options'] = $htmlOptions;
-            }
-            if (isset($ctrl['options']) && is_callable($ctrl['options'])) {
-                $ctrl['options'] = $this->evaluateExpression($ctrl['options'], ['data' => $model]);
-            }
-
-            foreach($control as $key=>$value){
-                if (in_array($key, ['button', 'live', 'template', 'config', 'container', 'controls', 'links']))
-                    $ctrl[$key] = $value;
-            }
-
-            if ($label && !in_array($type, ['label', 'switch', 'toggler']) && (isset($this->required[$name])))
-                $ctrl['required'] = true;
-        } else if ($type)
-            throw new \Exception('Control type ' . $type . ' was not found');
-
-        return $ctrl;
     }*/
 }

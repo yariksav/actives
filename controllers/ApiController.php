@@ -33,22 +33,13 @@ class ApiController extends Controller
     public $enableCsrfValidation = false;
 
     public function actionIndex(){
-
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         Yii::$app->response->headers->add('Access-Control-Allow-Origin','*');
 
         $dialog = null;
         $response = [];
         try{
-            $data = Yii::$app->request->post('data');
-            if ($data === null) {
-                $data = $_GET;
-            } else {
-                $data = json_decode($data, true);
-            }
-
-            //$data = strtr($data, array('#u002F'=>'/', '#u002B'=>'+', '#u0026'=>'&', '#u0025'=>'%'));
-
+            $data = json_decode(urldecode(file_get_contents("php://input")), true);
             unset($data['permissions'], $data['actions'], $data['controls']);
 
             $dialog = ActiveObject::createObject($data);
@@ -56,7 +47,7 @@ class ApiController extends Controller
         }
         // Для логики опросов
         catch (ConfirmException $e){
-            $confirm['confirm'] = ArrayHelper::getValue($data, 'confirm', array());
+            $confirm['confirm'] = ArrayHelper::getValue($data, 'confirm', []);
             $confirm['confirm'][$e->id] = [
                 'message'=>$e->getMessage(),
                 'buttons'=>$e->buttons
@@ -72,33 +63,19 @@ class ApiController extends Controller
         catch (HttpException $e){
             throw $e;
         }
-        // Ошибка
-        /*catch (SyException $e){
-            var_export($e);
-            $msg = $e->getMessage();
-            if (strpos($msg, 'Integrity constraint violation: 1451') !== false)
-                $msg = Yii::t('app.error', 'You can not delete a record, as it referred to the data from other tables');
 
-            Yii::error('Dialog Exception: ' . $e->getMessage());
-            $response['error'] = str_replace('<br/>', ' ', trim($msg));
-            $response['code'] = $e->getCode();
-            if ($dialog && isset($dialog->validation)) {
-                Yii::info(var_export($dialog->validation, true));
-                $response['validation'] = $dialog->validation;
-            }
-        }*/
         Yii::$app->response->format = 'html';
         return $response;
     }
-
-    public function actionGrid(){
-        $data = Yii::$app->request->post('data');
-        $data = json_decode($data, true);
-        $grid = ActiveObject::createObject($data);
-        $grid->run();
-        Yii::$app->response->format = 'json';
-        return $grid->response;
-    }
+//
+//    public function actionGrid(){
+//        $data = Yii::$app->request->post('data');
+//        $data = json_decode($data, true);
+//        $grid = ActiveObject::createObject($data);
+//        $grid->run();
+//        Yii::$app->response->format = 'json';
+//        return $grid->response;
+//    }
 
     public function actionExport() {
 

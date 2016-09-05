@@ -18,7 +18,8 @@ class Column extends ProtectedObject
     public $value;
     public $header;
     public $format = null;
-    //public $grid;
+
+
     public $type='text';
     public $footer;
     public $sortable=true;

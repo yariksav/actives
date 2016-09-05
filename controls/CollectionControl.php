@@ -8,16 +8,24 @@
 
 namespace yariksav\actives\controls;
 
-
 class CollectionControl extends Control {
 
     public $fields;
+    /**
+     * @var array the list of items
+     */
     protected $_collection;
 
+    /**
+     * Returns the list of items.
+     */
     public function getCollection() {
         return $this->_collection;
     }
 
+    /**
+     * Sets the list of items.
+     */
     public function setCollection($value) {
         $this->_collection = $value;
     }
