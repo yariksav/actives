@@ -5,7 +5,14 @@ use yii;
 
 class ColumnMenuPlugin extends BaseMenu
 {
+    public $tag;
+    public $tagOptions = [];
+    public $showText = false;
+
     public function build() {
-        return parent::build();
+        return array_merge(parent::build(), [
+            'tag' => $this->tag,
+            'showText' => $this->showText
+        ]);
     }
 }

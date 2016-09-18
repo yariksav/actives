@@ -3,6 +3,7 @@
 namespace yariksav\actives\dialog;
 
 
+use yariksav\actives\base\ViewerTrait;
 use yii;
 use yii\base\Model;
 use yii\helpers\Url;
@@ -25,6 +26,7 @@ class Dialog extends BaseDialog {
     public $title;
     public $name;
     public $control;
+    public $template;
 
     protected $_data = false;
     protected $_actions = [];
@@ -127,7 +129,22 @@ class Dialog extends BaseDialog {
         }
         $this->_controls->model = $this->getModel();
         $this->response->controls = $this->_controls->build();
+        if ($this->template) {
+            $this->response->template = $this->renderTemplate();
+        }
         $this->addResponseOptions();
+    }
+
+    protected function renderTemplate() {
+        if (is_string($this->template)) {
+            $content = $this->getView()->render($this->template, array_merge([
+                'model' => $this->getModel(),
+                'owner' => $this,
+            ]), $this);
+        } else {
+            $content = call_user_func($this->template, $model, $this);
+        }
+        return $content;
     }
 
     protected function addResponseOptions(){

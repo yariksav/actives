@@ -61,6 +61,8 @@ class Collection extends Object
                 if(isset($matches[3]) && $matches[3] !== '') {
                     $item['type'] = $matches[3];
                 }
+            } else if (is_string($item) && is_string($name)) {
+                $item = ['class'=>$item];
             }
 
             if (is_array($item)) {

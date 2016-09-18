@@ -12,12 +12,17 @@ class Button extends ProtectedObject
     public $name;
     public $text;
     public $type;
+    public $options;
 
     public function build($model) {
         $btn = [
             'text' => $this->text,
-            'icon' => $this->icon
+            'icon' => $this->icon,
         ];
+
+        if ($this->options) {
+            $btn['options'] = $this->options;
+        }
 
         if ($this->data) {
             $btn['data'] = is_callable($this->data) ? call_user_func_array($this->data, ['data' => $model]) : $this->data;

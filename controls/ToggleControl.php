@@ -22,4 +22,10 @@ class ToggleControl extends CollectionControl {
         }
         return $ret;
     }
+
+    public function update($value) {
+        $keys = array_keys($this->_collection);
+        $key = array_search($value, $keys);
+        parent::update($keys[$key]);
+    }
 }

@@ -5,11 +5,11 @@ namespace yariksav\actives\view\buttons;
 use yii;
 use yii\base;
 use yii\base\Object;
-use yariksav\actives\base\CollectionMgr;
 use yariksav\actives\base\Component;
+use yariksav\actives\base\Collection;
 
 
-class ButtonMgr extends CollectionMgr
+class ButtonMgr extends Collection
 {
 
     public static $builtInColumns = [

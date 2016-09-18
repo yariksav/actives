@@ -4,8 +4,10 @@ namespace yariksav\actives\base;
 
 use yii;
 
-class ActiveObject extends Component
+class ActiveObject extends Component implements yii\base\ViewContextInterface
 {
+    use ViewerTrait;
+
     protected $name;
     protected $emits = [];
     protected $listens = [];

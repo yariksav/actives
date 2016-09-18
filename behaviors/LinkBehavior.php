@@ -9,6 +9,7 @@ namespace yariksav\actives\behaviors;
 
 use yii\base\Behavior;
 use yii\base\InvalidCallException;
+use yii\base\InvalidConfigException;
 use yii\db\BaseActiveRecord;
 use yii\helpers\ArrayHelper;
 
@@ -67,10 +68,10 @@ class LinkBehavior extends Behavior
     public $linkKeys;
 
     /**
-     * @var array set changed links
-     * if not sets - events will not be triggered
+     * @var array | boolean set changed links
+     * if false - events will not trigger
      */
-    protected $newValues;
+    protected $newValues = false;
 
     /**
      * @var callable gets links values
@@ -84,7 +85,7 @@ class LinkBehavior extends Behavior
      * ```
      * If not set links will be deleted automatically
      */
-    protected $values;
+    public $values;
     /**
      * @var callable insert new calculated links ids
      * ```php
@@ -92,7 +93,7 @@ class LinkBehavior extends Behavior
      * ```
      * If not set links will be deleted automatically
      */
-    public $insertLinks;
+    public $insert;
     /**
      * @var callable delete calculated links ids
      * ```php
@@ -103,15 +104,19 @@ class LinkBehavior extends Behavior
      * ```
      * If not set links will be deleted automatically
      */
-    public $deleteLinks;
+    public $delete;
 
     /**
      * @inheritdoc
      */
     public function init() {
         parent::init();
-        if ($this->attribute === null || $this->linkModel === null || $this->linkKeys === null) {
-            throw new InvalidConfigException('Properties "attribute", "linkModel" and "linkKeys" must be specified.');
+        if ($this->attribute === null) {
+            throw new InvalidConfigException('Propertiy "attribute" must be specified.');
+        }
+
+        if ((!$this->insert || !$this->delete) && ($this->linkModel === null || $this->linkKeys === null)) {
+            throw new InvalidConfigException('Either callbacks "insert", "delete" or properties "linkModel", "linkKeys" must be specified.');
         }
 
         if (!$this->values) {
@@ -125,8 +130,8 @@ class LinkBehavior extends Behavior
             };
         }
 
-        if (!$this->insertLinks) {
-            $this->insertLinks = function($model, $ids) {
+        if (!$this->insert) {
+            $this->insert = function($model, $ids) {
                 $class = $this->linkModel;
                 foreach ($ids as $id) {
                     (new $class([
@@ -137,12 +142,12 @@ class LinkBehavior extends Behavior
             };
         }
 
-        if (!$this->deleteLinks) {
-            $this->deleteLinks = function($model, $ids) {
+        if (!$this->delete) {
+            $this->delete = function($model, $ids) {
                 $class = $this->linkModel;
                 $class::deleteAll([
                     $this->linkKeys[0]=>$this->owner[$this->key],
-                    $this->linkKeys[1]=>(array)$ids
+                    $this->linkKeys[1]=>$ids
                 ]);
             };
         }
@@ -196,25 +201,25 @@ class LinkBehavior extends Behavior
         }
     }
 
-    public function saveLinks()
+    public function onSave()
     {
-        if ($this->newValues === null) {
+        if ($this->newValues === false) {
             return;
         }
 
-        $currencies = $this->getValue();
+        $currentLinks = $this->getValue();
 
-        if ($delete = array_diff($currencies, $this->newValues)) {
-            call_user_func($this->deleteLinks, $this->owner, $delete);
+        if ($delete = array_diff($currentLinks, $this->newValues)) {
+            call_user_func($this->delete, $this->owner, (array)$delete);
         }
 
-        if ($insert = array_diff($this->newValues, $currencies)) {
-            call_user_func($this->insertLinks, $this->owner, $insert);//(new CountryCurrency(['countryId'=>$this->id, 'currencyId'=>$id]))->save();
+        if ($insert = array_diff($this->newValues, $currentLinks)) {
+            call_user_func($this->insert, $this->owner, (array)$insert);
         }
     }
 
-    public function deleteLinks() {
-        call_user_func($this->deleteLinks, $this->owner, $this->getValue());
+    public function onDelete() {
+        call_user_func($this->delete, $this->owner, $this->getValue());
     }
 
     /**
@@ -223,9 +228,9 @@ class LinkBehavior extends Behavior
     public function events()
     {
         return [
-            BaseActiveRecord::EVENT_AFTER_INSERT => [$this, 'saveLinks'],
-            BaseActiveRecord::EVENT_AFTER_UPDATE => [$this, 'saveLinks'],
-            BaseActiveRecord::EVENT_BEFORE_DELETE => [$this, 'deleteLinks'],
+            BaseActiveRecord::EVENT_AFTER_INSERT => [$this, 'onSave'],
+            BaseActiveRecord::EVENT_AFTER_UPDATE => [$this, 'onSave'],
+            BaseActiveRecord::EVENT_BEFORE_DELETE => [$this, 'onDelete'],
         ];
     }
 }

@@ -7,9 +7,8 @@ use yii\helpers\Html;
 use yii\base\ViewContextInterface;
 use yariksav\actives\base\ViewerTrait;
 
-class ListView extends ActiveList implements ViewContextInterface
+class ListView extends ActiveList
 {
-    use ViewerTrait;
     /**
      * @var array the HTML attributes for the container of the rendering result of each data model.
      * The "tag" element specifies the tag name of the container element and defaults to "div".
@@ -25,7 +24,7 @@ class ListView extends ActiveList implements ViewContextInterface
      * - `$model`: mixed, the data model
      * - `$key`: mixed, the key value associated with the data item
      * - `$index`: integer, the zero-based index of the data item in the items array returned by [[dataProvider]].
-     * - `$widget`: ListView, this widget instance
+     * - `$owner`: ListView, this widget instance
      *
      * Note that the view name is resolved into the view file by the current context of the [[view]] object.
      *
@@ -45,18 +44,6 @@ class ListView extends ActiveList implements ViewContextInterface
 
     public $componentName = 'ListView';
 
-
-//    public function renderPhpFile($_file_, $_params_ = [])
-//    {
-//        ob_start();
-//        ob_implicit_flush(false);
-//        extract($_params_, EXTR_OVERWRITE);
-//        require($_file_);
-//
-//        return ob_get_clean();
-//    }
-
-
     /**
      * Renders a single data model.
      * @param mixed $model the data model to be rendered
@@ -73,7 +60,7 @@ class ListView extends ActiveList implements ViewContextInterface
                 'model' => $model,
                 'key' => $key,
                 'index' => $index,
-                'widget' => $this,
+                'owner' => $this,
             ], $this->viewParams), $this);
         } else {
             $content = call_user_func($this->itemView, $model, $key, $index, $this);

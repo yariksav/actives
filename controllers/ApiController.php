@@ -67,15 +67,6 @@ class ApiController extends Controller
         Yii::$app->response->format = 'html';
         return $response;
     }
-//
-//    public function actionGrid(){
-//        $data = Yii::$app->request->post('data');
-//        $data = json_decode($data, true);
-//        $grid = ActiveObject::createObject($data);
-//        $grid->run();
-//        Yii::$app->response->format = 'json';
-//        return $grid->response;
-//    }
 
     public function actionExport() {
 

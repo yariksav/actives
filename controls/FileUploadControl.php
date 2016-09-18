@@ -35,6 +35,7 @@ class FileUploadControl extends Control {
             $path = $key.'.'.pathinfo($file['name'])['extension'];
 
             $this->renderFile($path, $content);
+            //$value[$key]['filePath'
         }
 //        throw new yii\base\Exception('test');
     }

@@ -5,11 +5,11 @@ namespace yariksav\actives\view\columns;
 use yii;
 use yii\base;
 use yii\base\Object;
-use yariksav\actives\base\CollectionMgr;
+use yariksav\actives\base\Collection;
 use yariksav\actives\base\Component;
 
 
-class ColumnMgr extends CollectionMgr
+class ColumnMgr extends Collection
 {
 
     public static $builtInColumns = [
@@ -41,21 +41,6 @@ class ColumnMgr extends CollectionMgr
         return Yii::createObject($params, [
             $this->owner
         ]);
-
-/*        $name = $params['name'];
-        if (empty($name) || is_int($name)) {
-            throw new \Exception('Please get the name for action');
-        }
-
-        if (empty($params['class'])) {
-            $params['class'] = Action::className();
-        }
-        $obj = Yii::createObject($params, [$this->owner]);
-        // Disable previous action events if exists
-        if (isset($this->_collection[$name]) && $this->_collection[$name] instanceof DialogAction) {
-            $this->_collection[$name]->disableEvents();
-        }
-        return $obj;*/
     }
 
 

@@ -15,10 +15,9 @@ class ImageUploadControl extends FileUploadControl {
 
     public $storage;
     public $sizes = [
-        'original'=>800,
-        'large'=>256,
-        'normal'=>129,
-        'small'=>64
+        'large'=>800,
+        'normal'=>256,
+        'small'=>128
     ];
 
     public function build() {

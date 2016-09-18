@@ -19,6 +19,7 @@ class ControlMgr extends Collection {
         'number' => 'yariksav\actives\controls\Control',
         'textbox' => 'yariksav\actives\controls\Control',
         'textarea' => 'yariksav\actives\controls\Control',
+        'htmleditor' => 'yariksav\actives\controls\Control',
         'select' => 'yariksav\actives\controls\SelectControl',
         'toggler' => 'yariksav\actives\controls\ToggleControl',
         'checklist' => 'yariksav\actives\controls\CheckListControl',

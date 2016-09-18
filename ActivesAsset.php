@@ -33,14 +33,14 @@ class ActivesAsset extends AssetBundle
         //'js/datepicker/bootstrap-datepicker.css',
         //'js/datetimepicker/css/bootstrap-datetimepicker.css',
         'js/sy.grid.css',
-        'js/sy.tree.css'
+        'js/sy.tree.css',
+        'css/tm_docs.css',
     ];
     public $js = [
         //'js/common.js',
-        'js/src/app.js',
+        'js/app.js',
         'js/templates.js',
         //'js/all.js',
-        'js/selectize.js',
         'js/sy.toggler.js',
         'js/daterangepicker/moment.min.js',
         'js/daterangepicker/daterangepicker.js',

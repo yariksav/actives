@@ -22,7 +22,7 @@ class ActivesBowerAsset extends AssetBundle
         'selectize/dist/css/selectize.bootstrap3.css',
     ];
     public $js = [
-        'selectize/dist/js/selectize.min.js',
-        'hello/dist/hello.all.js',
+        'selectize/dist/js/standalone/selectize.min.js',
+        //'hello/dist/hello.all.js',
     ];
 }
