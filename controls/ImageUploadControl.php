@@ -8,30 +8,53 @@
 
 namespace yariksav\actives\controls;
 
+use app\models\Image;
+use yariksav\actives\base\File;
 use yii;
-use yariksav\actives\helpers\SimpleImage;
+use yariksav\actives\base\SimpleImage;
 
 class ImageUploadControl extends FileUploadControl {
 
-    public $storage;
-    public $sizes = [
-        'large'=>800,
-        'normal'=>256,
-        'small'=>128
-    ];
+    public $maxSize;
+    public $quality = 1;
 
     public function build() {
         return array_merge(parent::build(), [
-            'maxSize'=>max(array_values($this->sizes))
+            'maxSize'=>$this->maxSize,
+            'quality'=>$this->quality
         ]);
     }
 
-    function decodeFile($content) {
-        return base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $content['content']));
+    function decodeFile($config) {
+        return base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $config['content']));
     }
 
-    function renderFile($name, $content) {
-        parent::renderFile($name, $content);
+    public function validate() {
+        if (!$this->files) {
+            return 'Need file';
+        }
+    }
+
+    function renderFile(File $file) {
+//        $path = $file->path;
+//        $file->folder = 'original';
+//        $file->save();
+//
+//        $imageHelper = new SimpleImage();
+//        $imageHelper->load($file->fullPath());
+//
+//        $image = new Image();
+//        $image->fill($file);
+//        $image->width = $imageHelper->getWidth();
+//        $image->height = $imageHelper->getHeight();
+//        $image->save();
+
+
+
+
+//        $image->resize(256, 256);
+//        $image->save($path . "256." . $ext);
+//        parent::renderFile($file);
         //TODO
 //        $path = $this->getFilePath($name);
 //
@@ -45,5 +68,6 @@ class ImageUploadControl extends FileUploadControl {
 //        $image->save($path . "256." . $ext);
 
     }
+
 }
 //yii migrate/up --migrationPath=@app/modules/modName/migrations

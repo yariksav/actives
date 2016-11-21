@@ -8,9 +8,24 @@
 
 namespace yariksav\actives\controls;
 
+use yii\db\Query;
 use yii\helpers\ArrayHelper;
 
 class SelectControl extends CollectionControl {
+
+    /*
+     * @var string sets name of key field. If not asset - collection must be key=>value associative array
+     */
+    public $key;
+    /**
+     * @var string|\Closure sets the name of item field, or render in closure.
+     */
+    public $item;
+    /**
+     * @var string|\Closure the group field in model or value from function
+     */
+    public $group;
+
 
     public $button;
 
@@ -39,14 +54,12 @@ class SelectControl extends CollectionControl {
             $collection = $this->_collection;
         }
 
+        if ($collection instanceof Query) {
+            $collection = $collection->all();
+        }
         // render collection to proper format
-        if (isset($this->fields) && is_array($this->fields)) {
-            $collection = ArrayHelper::map(
-                $collection,
-                ArrayHelper::getValue($this->fields, 0, 'id'),
-                ArrayHelper::getValue($this->fields, 1, 'name'),
-                ArrayHelper::getValue($this->fields, 2)
-            );
+        if ($this->key && $this->item) {
+            $collection = ArrayHelper::map($collection, $this->key, $this->item, $this->group);
         }
         return $collection;
     }

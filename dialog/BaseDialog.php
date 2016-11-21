@@ -19,6 +19,7 @@ class BaseDialog extends ActiveObject {
     protected $_action;
     protected $isNewRecord;
     protected $_config;
+    public $componentName = 'Dialog'; //????
 
     public function __construct($config = []) {
         $this->response = new \stdClass();

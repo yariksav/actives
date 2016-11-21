@@ -28,43 +28,41 @@ class ActivesAsset extends AssetBundle
 
         'css/dialog.css',
         'css/sy.alerts.css',
-        'js/sy.toggler.css',
-        'js/daterangepicker/daterangepicker.css',
+        //'js/sy.toggler.css',
+        //'js/daterangepicker/daterangepicker.css',
         //'js/datepicker/bootstrap-datepicker.css',
         //'js/datetimepicker/css/bootstrap-datetimepicker.css',
         'js/sy.grid.css',
-        'js/sy.tree.css',
-        'css/tm_docs.css',
+        //'js/sy.tree.css',
+        //'css/tm_docs.css',
     ];
     public $js = [
         //'js/common.js',
         'js/app.js',
         'js/templates.js',
         //'js/all.js',
-        'js/sy.toggler.js',
-        'js/daterangepicker/moment.min.js',
-        'js/daterangepicker/daterangepicker.js',
-        'js/daterangepicker/daterangepicker.ru.js',
+        //'js/sy.toggler.js',
+        //'js/daterangepicker/moment.min.js',
+        //'js/daterangepicker/daterangepicker.js',
+        //'js/daterangepicker/daterangepicker.ru.js',
         //'js/datepicker/bootstrap-datepicker.js',
         //'js/datepicker/bootstrap-datepicker.ru.min.js',
-        'js/datetimepicker/js/bootstrap-datetimepicker.js',
+        //'js/datetimepicker/js/bootstrap-datetimepicker.js',
         'js/locationpicker.js',
         //'js/datetimepicker/js/locales/bootstrap-datetimepicker.ru.js',
         //'js/sy.utils.js',
         //'js/sy.dialog.js',
         //'js/sy.html.js',
         'js/sy.alerts.js',
-        'js/jquery.numeric.min.js',
+        //'js/jquery.numeric.min.js',
         //'js/sy.grid.js',
         //'js/sy.context.js',
-        'js/sy.tree.js',
+        //'js/sy.tree.js',
     ];
 
     public $depends = [
         'yii\bootstrap\BootstrapAsset',
         'yii\bootstrap\BootstrapPluginAsset',
-        'yariksav\actives\ActivesBowerAsset',
-        'rmrevin\yii\fontawesome\AssetBundle'
     ];
 
     public function init(){

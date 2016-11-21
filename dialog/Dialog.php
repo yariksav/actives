@@ -163,8 +163,13 @@ class Dialog extends BaseDialog {
     protected function verify() {
         if ($this->model instanceof Model) {
             $this->model->validate();
-            $this->_validation = array_merge($this->_validation, $this->model->errors);
+            $this->_validation = array_merge(
+                $this->_validation,
+                $this->model->errors//,
+                //$this->_controls->validate()
+            );
         }
+
         if ($this->_validation) {
             throw new ValidationException($this->_validation);
         }

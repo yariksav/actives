@@ -19,16 +19,6 @@ class SelectizeControl extends SelectControl implements ViewContextInterface
 {
     use ViewerTrait;
 
-    /*
-     * @var string sets name of key field. If not asset - collection must be key=>value associative array
-     */
-    public $key;
-
-    /**
-     * @var string|\Closure sets the name of item field, or render in closure.
-     */
-    public $item;
-
     /**
      * @var string|\Closure sets the view path for rendering item in template, or render in closure.
      */
@@ -46,11 +36,6 @@ class SelectizeControl extends SelectControl implements ViewContextInterface
      * @var array additional config ptions of selectize component
      */
     public $elementOptions;
-
-    /**
-     * @var string|\Closure the group field in model or value from function
-     */
-    public $group;
 
     /**
      * @var array|\Closure variation of groups. Returns associative key=>value array
@@ -109,7 +94,7 @@ class SelectizeControl extends SelectControl implements ViewContextInterface
      */
     protected function renderItems($collection) {
         $rows = [];
-        foreach ($collection as $index => $model) {
+        if ($collection) foreach ($collection as $index => $model) {
             $rows[] = $this->renderItem($model, $index);
         }
         return $rows;

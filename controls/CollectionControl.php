@@ -10,7 +10,6 @@ namespace yariksav\actives\controls;
 
 class CollectionControl extends Control {
 
-    public $fields;
     /**
      * @var array the list of items
      */

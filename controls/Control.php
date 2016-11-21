@@ -57,8 +57,7 @@ class Control extends Component
     function __construct($owner, $model = null, $config = []) {
         parent::__construct($config);
         $this->owner = $owner;
-        $this->_model = $model;
-
+        $this->model = $model;
     }
 
     public function getModel() {
@@ -67,8 +66,29 @@ class Control extends Component
 
     public function setModel($value) {
         $this->_model = $value;
-        if ($this->_model instanceof Model && is_callable($this->validate)) {
-            $this->_model->on(yii\base\Model::EVENT_BEFORE_VALIDATE, $this->validate);
+        if (!$this->_model) {
+            return;
+        }
+        if ($this->_model instanceof Model) {
+            if (is_callable($this->validate)) {
+                $this->_model->on(yii\base\Model::EVENT_BEFORE_VALIDATE,
+                    function($event) {
+                        $model = $event->data[0];
+                        $control = $event->data[1];
+                        $this->validate($model, $control);
+                    }, [$value, $this]);
+            }
+            // Register After Save
+            if (is_callable($this->afterSave)) {
+                $eventName = $this->_model->getIsNewRecord() ? yii\db\ActiveRecord::EVENT_AFTER_INSERT : yii\db\ActiveRecord::EVENT_AFTER_UPDATE;
+
+                $this->_model->on($eventName,
+                    function($event){
+                        $model = $event->data[0];
+                        $control = $event->data[1];
+                        call_user_func_array($control->afterSave, [$model, $control]);
+                    }, [$value, $this]);
+            }
         }
     }
 
@@ -181,12 +201,7 @@ class Control extends Component
 //            ]);
 //        };
 //
-//        // Register After Save
-//        if (is_callable($this->afterSave) && $model instanceof Model) {
-//            if ($model->getIsNewRecord()) {
-//                $model->on($model->getIsNewRecord() ? yii\db\ActiveRecord::EVENT_AFTER_INSERT : yii\db\ActiveRecord::EVENT_AFTER_UPDATE, $callback);
-//            }
-//        }
+
 
         // Call Save
         if (is_callable($this->save)) {
@@ -198,13 +213,17 @@ class Control extends Component
 
             if (isset($model)) {
                 if ($model instanceof Model) {
-                    //if ($model->isAttributeActive($name)) {
+                    //if ($model->hasProperty($name)) { //if ($model->isAttributeActive($name)) {
                         $model->$name = $value;
                     //}
-                } else {
+                } else if (isset($model[$name])) {
                     $model[$name] = $value;
                 }
             }
         }
     }
+//
+//    public function validate() {
+//        return null;
+//    }
 }

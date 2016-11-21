@@ -24,7 +24,12 @@ abstract class ActiveView extends ActiveObject
 
     protected $request;
     protected $response;
-    //protected $data;
+
+    protected $_data;
+
+    public function getResponse() {
+        return $this->response;
+    }
 
     public $visible = true;
 
@@ -37,11 +42,6 @@ abstract class ActiveView extends ActiveObject
         parent::__construct($config);
     }
 
-    function init() {
-        if ($this->_provider && $this->_plugins) {
-            $this->_plugins->setProvider($this->_provider);
-        }
-    }
     public function actionInit(){
         $this->renderItems();
         $this->renderOptions();
@@ -52,8 +52,19 @@ abstract class ActiveView extends ActiveObject
     }
 
     public function renderItems() {
-
+        $this->response->data = $this->_data;
     }
+
+
+
+    public function getData() {
+        return $this->_data;
+    }
+    public function setData($value) {
+        $this->_data = $value;
+    }
+
+
 
     public function setPlugins($value) {
         $this->_plugins->load($value);
@@ -66,11 +77,8 @@ abstract class ActiveView extends ActiveObject
     protected function renderOptions() {
         $this->response->plugins = $this->_plugins->build();
 
-        if ($this->title) {
-            $this->response->title = $this->title;
-        }
         $this->response->name = $this->name;
-        $this->response->url = Url::toRoute('/actives/api/grid');
+        //$this->response->url = Url::toRoute('/actives/api/grid');
 
         $this->response->buttons = $this->_buttons->build();
         $this->response->listens = $this->listens;

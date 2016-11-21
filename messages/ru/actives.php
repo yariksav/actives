@@ -6,6 +6,11 @@ return [
     'Please type your search query here'=>'Введите текст для поиска',
     'Record not found'=>'Запись не найдена',
     'Please select' => 'Необходимо выбрать',
+    'Drop files here or click to upload'=>'Перетащите файлы сюда или кликните для загрузки',
+
+
+
+
 
     'Show'=>'Показать',
     'View'=>'Просмотреть',

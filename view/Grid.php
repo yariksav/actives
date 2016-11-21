@@ -25,8 +25,6 @@ class Grid extends ActiveList
         $this->_columns->load($value);
     }
 
-
-
     protected function renderOptions(){
         parent::renderOptions();
         $this->response->columns = $this->_columns->build();

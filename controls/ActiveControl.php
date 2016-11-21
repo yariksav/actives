@@ -14,12 +14,17 @@ use yariksav\actives\base\ActiveObject;
 class ActiveControl extends Control {
 
     public $requireModel = true;
+    protected $component;
 
     public function load() {
-        $instance = ActiveObject::createObject($this->config);
-        $instance->run();
+        if (isset($this->_value)) {
+            $this->config['data'] = $this->getValue();
+        }
+        $this->component = ActiveObject::createObject($this->config);
+        $this->component->run();
         return [
-            'data'=>$instance->getResponse()
+            'data'=>$this->component->getResponse(),
+            'component'=>$this->component->componentName
         ];
     }
 }

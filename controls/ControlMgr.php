@@ -32,6 +32,8 @@ class ControlMgr extends Collection {
         'grid' => 'yariksav\actives\controls\ActiveControl',
         'tree' => 'yariksav\actives\controls\ActiveControl',
         'listview' => 'yariksav\actives\controls\ActiveControl',
+        'view' => 'yariksav\actives\controls\ActiveControl',
+
         'dialog' => 'yariksav\actives\controls\DialogControl',
         'tree' => 'yariksav\actives\controls\TreeControl',
         'tag' => 'yariksav\actives\controls\Control',
@@ -134,7 +136,17 @@ class ControlMgr extends Collection {
             }
         }
     }
-
+//
+//    public function validate() {
+//        $validation = [];
+//        foreach ($this->_collection as $name=>$control) {
+//            $res = $control->validate();
+//            if (is_string($res)) {
+//                $validation[$name] = [$res];
+//            }
+//        }
+//        return $validation;
+//    }
 
 
 /*

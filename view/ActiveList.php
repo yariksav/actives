@@ -18,11 +18,17 @@ abstract class ActiveList extends ActiveView
     public $identifier = 'id';
 
     protected $_provider;
-    protected $_data;
+//    protected $_data;
+//
+//
+//    public function getData() {
+//        return $this->_data;
+//    }
 
-
-    public function getData() {
-        return $this->_data;
+    function init() {
+        if ($this->_provider && $this->_plugins) {
+            $this->_plugins->setProvider($this->_provider);
+        }
     }
 
     public function setData($value) {
@@ -88,6 +94,13 @@ abstract class ActiveList extends ActiveView
         //            $response->system = base64_encode(json_encode($this->system));
         //        }
         return $response;
+    }
+
+    protected function renderOptions() {
+        parent::renderOptions();
+        if ($this->title) {
+            $this->response->title = $this->title;
+        }
     }
 
 }
