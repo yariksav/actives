@@ -3,16 +3,52 @@
 namespace yariksav\actives\base;
 
 use yii;
+use yii\helpers\Html;
 
-class ActiveObject extends Component implements yii\base\ViewContextInterface
+abstract class ActiveObject extends Component implements yii\base\ViewContextInterface, RunnableInterface
 {
     use ViewerTrait;
 
     protected $name;
     protected $emits = [];
     protected $listens = [];
+    public $componentName;
+    protected $_response;
 
-    protected function beforeInit() {}
+    function __construct($config = []) {
+        $this->_response = new \stdClass();
+        parent::__construct($config);
+    }
+
+//    public function className() {
+//        return get_called_class();
+//    }
+    protected function beforeInit() {} // todo ????
+
+    
+    public function getResponse() {
+        return $this->_response;
+        // todo: check is this necessary
+        //        if (isset($response->data)){
+        //            $response->system = base64_encode(json_encode($this->system));
+        //        }
+    }
+
+    public static function widget($config){
+        $instance = self::createObject($config);
+        $instance->run();
+        return Html::tag('div', '', [
+            'data'=>[
+                'class' => $instance->className(),
+                'cmp' => $instance->componentName,
+                'cmp-config' => json_encode($instance->response)
+            ],
+        ]);
+    }
+
+    public function setResponse($value) {
+        $this->_response = $value;
+    }
 
     public static function createObject($config=[]){
         if (empty($config['class'])) {

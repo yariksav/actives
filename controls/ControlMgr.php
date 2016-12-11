@@ -37,7 +37,7 @@ class ControlMgr extends Collection {
         'dialog' => 'yariksav\actives\controls\DialogControl',
         'tree' => 'yariksav\actives\controls\TreeControl',
         'tag' => 'yariksav\actives\controls\Control',
-        'auth' => 'yariksav\actives\controls\Control',
+        'socialAuth' => 'yariksav\actives\controls\SocialAuth',
         'googleMaps' => 'yariksav\actives\controls\GoogleMapsControl',
         'fileUpload' => 'yariksav\actives\controls\FileUploadControl',
         'imageUpload' => 'yariksav\actives\controls\ImageUploadControl',
@@ -113,11 +113,12 @@ class ControlMgr extends Collection {
     }
 
     public function build() {
-        if (!$this->_collection)
+        if (!$this->_collection) {
             return [];
+        }
 
         $controls = [];
-        foreach ($this->_collection as $name=>$control) {
+        foreach ($this as $name=>$control) {
             if ($control && $control->visible && $control->hasPermissions()) {
                 $controls[$name] = $control->build();
             }

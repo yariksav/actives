@@ -23,7 +23,7 @@ class ActiveControl extends Control {
         $this->component = ActiveObject::createObject($this->config);
         $this->component->run();
         return [
-            'data'=>$this->component->getResponse(),
+            'config'=>$this->component->getResponse(),
             'component'=>$this->component->componentName
         ];
     }

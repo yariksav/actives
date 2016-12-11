@@ -45,10 +45,10 @@ class StepDialog extends BaseDialog {
     }
 
     public function renderOptions(){
-        $this->response->steps = $this->_steps->links();
-        $this->response->current = $this->_steps->current->name;
-        $this->response->stepNavigation = $this->_steps->navigation;
-        $this->response->stepNumeration = $this->_steps->numeration;
+        $this->_response->steps = $this->_steps->links();
+        $this->_response->current = $this->_steps->current->name;
+        $this->_response->stepNavigation = $this->_steps->navigation;
+        $this->_response->stepNumeration = $this->_steps->numeration;
     }
 
     public function getSteps() {
@@ -97,14 +97,14 @@ class StepDialog extends BaseDialog {
     protected function saveCurrent() {
         $step = $this->_steps->current;
         $step->action = 'save';
-        $this->response = $step->run();
+        $this->_response = $step->run();
         $this->key = $step->key;
     }
 
 
     protected function mergeToResponse($obj){
         foreach ($obj as $k => $v) {
-            $this->response->$k = $v;
+            $this->_response->$k = $v;
         }
     }
 }

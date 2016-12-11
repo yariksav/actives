@@ -51,8 +51,8 @@ class Dialog extends BaseDialog {
         ]);
 
         $this->options = [
-            'closeOnEscape' => true,
-            'isModal' => true,
+            'keyboard' => true,
+            'backdrop' => true,
         ];
 
 
@@ -278,20 +278,20 @@ class Dialog extends BaseDialog {
         $this->_actions->current = $value;
     }
 
-    public static function prepareJsDefaults($scriptWrap = true){
-        $defaults = [
-            'labels'=>[
-                'close' => Yii::t('actives', 'Close'),
-                'cancel'=> Yii::t('actives', 'Cancel'),
-                'yes'   => Yii::t('actives', 'Yes'),
-                'no'    => Yii::t('actives', 'No'),
-            ],
-            'ajax'=>[
-                'url'=>Url::toRoute('actives/api')
-            ],
-            'login'=>['class'=>'system.LoginDialog']
-        ];
-        return ';$.fn.sydialog.defaults('.json_encode($defaults).');';
-    }
+//    public static function prepareJsDefaults($scriptWrap = true){
+//        $defaults = [
+//            'labels'=>[
+//                'close' => Yii::t('actives', 'Close'),
+//                'cancel'=> Yii::t('actives', 'Cancel'),
+//                'yes'   => Yii::t('actives', 'Yes'),
+//                'no'    => Yii::t('actives', 'No'),
+//            ],
+//            'ajax'=>[
+//                'url'=>Url::toRoute('actives/api')
+//            ],
+//            'login'=>['class'=>'system.LoginDialog']
+//        ];
+//        return ';$.fn.sydialog.defaults('.json_encode($defaults).');';
+//    }
 }
 ?>

@@ -82,24 +82,15 @@ abstract class ActiveList extends ActiveView
         foreach (array_values($models) as $index => $model) {
             $rows[] = $this->renderItem($model, $keys[$index], $index);
         }
-        $this->response->data = new \stdClass();
-        $this->response->data->rows = $rows;
-        $this->response->data->total = $this->_provider->getTotalCount();
-    }
-
-
-    public function getResponse(){
-        $response = $this->response;
-        //        if (isset($response->data)){
-        //            $response->system = base64_encode(json_encode($this->system));
-        //        }
-        return $response;
+        $this->_response->data = new \stdClass();
+        $this->_response->data->rows = $rows;
+        $this->_response->data->total = $this->_provider->getTotalCount();
     }
 
     protected function renderOptions() {
         parent::renderOptions();
         if ($this->title) {
-            $this->response->title = $this->title;
+            $this->_response->title = $this->title;
         }
     }
 

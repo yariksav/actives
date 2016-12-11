@@ -14,7 +14,6 @@ class BaseDialog extends ActiveObject {
 
     public $key;
     public $width;
-    public $response;
 
     protected $_action;
     protected $isNewRecord;
@@ -22,9 +21,6 @@ class BaseDialog extends ActiveObject {
     public $componentName = 'Dialog'; //????
 
     public function __construct($config = []) {
-        $this->response = new \stdClass();
-        //$this->response->params = new \stdClass();
-
         $this->key =  ArrayHelper::getValue($config, 'key');
         $this->isNewRecord = !$this->key;
         $this->_config = $config;

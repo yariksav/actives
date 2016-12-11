@@ -7,7 +7,6 @@ class Pagination extends Plugin
 {
     protected $_pageSize;
     public $text;
-    public $button = 'link';
     public $page = 1;
     public $pageCount = 5;
 
@@ -31,7 +30,6 @@ class Pagination extends Plugin
     public function build() {
         return array_merge(parent::build(), [
             'text' => $this->text,
-            'button' => $this->button,
             'collection' => $this->collection,
             'pageSize' => $this->pageSize,
             'pageCount' => $this->pageCount,

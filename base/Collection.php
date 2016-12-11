@@ -12,7 +12,7 @@ use yii;
 use yii\base\Object;
 use yii\helpers\ArrayHelper;
 
-class Collection extends Object
+class Collection extends Object implements \Iterator
 {
     //protected $_current;
     protected $_collection;
@@ -102,5 +102,36 @@ class Collection extends Object
     public function clear() {
         $this->_collection = [];
     }
+
+    public function rewind()
+    {
+        reset($this->_collection);
+    }
+
+    public function current()
+    {
+        return current($this->_collection);
+    }
+
+    public function key()
+    {
+        return key($this->_collection);
+    }
+
+    public function next()
+    {
+        return next($this->_collection);
+    }
+
+    public function valid()
+    {
+        $key = key($this->_collection);
+        return ($key !== NULL && $key !== FALSE);
+    }
+
+
+//reset($List);
+//while (key($List) !== $id && key($List) !== null) next($List);
+//if(key($List) === null) end($List);
 
 }

@@ -40,7 +40,7 @@ class ApiController extends Controller
         $response = [];
         try{
             $data = json_decode(urldecode(file_get_contents("php://input")), true);
-            unset($data['permissions'], $data['actions'], $data['controls']);
+            unset($data['permissions'], $data['actions'], $data['controls'], $data['fields']);
 
             $dialog = ActiveObject::createObject($data);
             $response = json_encode($dialog->run());

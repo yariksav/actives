@@ -27,7 +27,7 @@ class Grid extends ActiveList
 
     protected function renderOptions(){
         parent::renderOptions();
-        $this->response->columns = $this->_columns->build();
+        $this->_response->columns = $this->_columns->build();
     }
     /**
      * Renders all data models.

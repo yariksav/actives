@@ -48,6 +48,7 @@ class Control extends Component
     protected $_type;
     protected $_value;
     protected $_model;
+    protected $_wrapper;
 
     /**
      * Constructor.
@@ -160,6 +161,15 @@ class Control extends Component
         $this->_name = $value;
     }
 
+
+
+    public function getWrapper() {
+        return $this->_wrapper;
+    }
+
+    public function setWrapper($value) {
+        $this->_wrapper = $value;
+    }
     /**
      * Builds full control config array.
      * @return array the control config
@@ -175,7 +185,7 @@ class Control extends Component
             $control['text'] = $text;
         }
         if ($this->options) {
-            $control['options'] = $this->options;
+            $control['config'] = $this->options;
         }
         return array_merge($control, $this->load());
     }

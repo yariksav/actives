@@ -2,7 +2,6 @@
 namespace yariksav\actives\view;
 
 use yii;
-use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\helpers\ArrayHelper;
 
@@ -16,25 +15,18 @@ abstract class ActiveView extends ActiveObject
     protected $_plugins;
     protected $_buttons;
 
-
     public $baseModel;// base model data if grid linked to some model
 
-    public $componentName;
+
     public $method = 'init'; //!!!!!!!!!!!!!!!!
 
     protected $request;
-    protected $response;
 
     protected $_data;
-
-    public function getResponse() {
-        return $this->response;
-    }
 
     public $visible = true;
 
     function __construct($config = []) {
-        $this->response = new \stdClass();
         $this->_plugins = new PluginMgr($this);
         $this->_buttons = new ButtonMgr($this);
         $this->name = get_called_class();
@@ -52,7 +44,7 @@ abstract class ActiveView extends ActiveObject
     }
 
     public function renderItems() {
-        $this->response->data = $this->_data;
+        $this->_response->data = $this->_data;
     }
 
 
@@ -75,16 +67,16 @@ abstract class ActiveView extends ActiveObject
     }
 
     protected function renderOptions() {
-        $this->response->plugins = $this->_plugins->build();
+        $this->_response->plugins = $this->_plugins->build();
 
-        $this->response->name = $this->name;
+        $this->_response->name = $this->name;
         //$this->response->url = Url::toRoute('/actives/api/grid');
 
-        $this->response->buttons = $this->_buttons->build();
-        $this->response->listens = $this->listens;
+        $this->_response->buttons = $this->_buttons->build();
+        $this->_response->listens = $this->listens;
 
-        $this->response->params = new \stdClass();
-        $this->response->params->class = $this->className();
+        $this->_response->params = new \stdClass();
+        $this->_response->params->class = $this->className();
     }
 
     public function run() {
@@ -96,20 +88,9 @@ abstract class ActiveView extends ActiveObject
             }
         }
         $this->renderAction();
-        return $this->response;
+        return $this->_response;
     }
 
-    public static function widget($config){
-        $instance = self::createObject($config);
-        $response = $instance->run();
-        return Html::tag('div', '', [
-            'class' => $instance->name,
-            'data-cmp' => $instance->componentName,
-            'data-json-config' => json_encode($response),
-            //'data-gzip-config' => base64_encode(gzencode(json_encode($response)))
-        ]);
-        return $response;
-    }
 
     protected function renderAction(){
         $action = 'action'.$this->method;

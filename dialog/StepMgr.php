@@ -60,8 +60,8 @@ class StepMgr extends Collection
             $index++;
             $title = ($this->numeration ? $index . '. ' : '').($step->title ? $step->title : ucfirst($step->name));
             $links[$name] = [
-                'title' => $title,
-                'current' => $name === $this->_current
+                'text' => $title,
+                'active' => $name === $this->_current
             ];
         }
         return $links;
