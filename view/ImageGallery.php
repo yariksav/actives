@@ -10,7 +10,7 @@ use yariksav\actives\base\ViewerTrait;
 
 class ImageGallery extends ActiveView
 {
-    public $componentName = 'ImageGallery';
+    public $cmp = 'ImageGallery';
   //  public $renderItem;
 
 //    public function renderItem($model, $key, $index)

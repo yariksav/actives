@@ -7,12 +7,14 @@ use yii\helpers\Html;
 
 abstract class ActiveObject extends Component implements yii\base\ViewContextInterface, RunnableInterface
 {
+    use PermissionTrait;
     use ViewerTrait;
+    use VisibleTrait;
 
     protected $name;
     protected $emits = [];
-    protected $listens = [];
-    public $componentName;
+    public $listens = [];
+    public $cmp;
     protected $_response;
 
     function __construct($config = []) {
@@ -20,37 +22,40 @@ abstract class ActiveObject extends Component implements yii\base\ViewContextInt
         parent::__construct($config);
     }
 
-//    public function className() {
-//        return get_called_class();
-//    }
-    protected function beforeInit() {} // todo ????
-
-    
     public function getResponse() {
         return $this->_response;
-        // todo: check is this necessary
-        //        if (isset($response->data)){
-        //            $response->system = base64_encode(json_encode($this->system));
-        //        }
-    }
-
-    public static function widget($config){
-        $instance = self::createObject($config);
-        $instance->run();
-        return Html::tag('div', '', [
-            'data'=>[
-                'class' => $instance->className(),
-                'cmp' => $instance->componentName,
-                'cmp-config' => json_encode($instance->response)
-            ],
-        ]);
     }
 
     public function setResponse($value) {
         $this->_response = $value;
     }
 
-    public static function createObject($config=[]){
+    public static function widget($config = []){
+        if (empty($config['class'])) {
+            $config['class'] = get_called_class();
+        }
+        $instance = Yii::createObject($config, []);
+        $instance->run();
+        return Html::tag('div', '', [
+            'data'=>[
+                'api-url' => $instance::apiUrl(),
+                'cmp' => $instance->cmp,
+                'cmp-config' => json_encode($instance->response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+            ],
+        ]);
+    }
+
+    public static function apiUrl($action = null) {
+        $className = \yii\helpers\StringHelper::basename(get_called_class());
+        $namespace = implode('\\', explode('\\', get_called_class(), -1));
+        $alias = array_search($namespace, Yii::$app->params['alias']);
+        if ($alias !== false) {
+            return $alias.'/'.lcfirst($className) . ($action ? '/'.$action : '');
+        }
+    }
+
+
+/*    public static function createObject($config=[]){
         if (empty($config['class'])) {
             throw new \Exception('Object class is not defined');
         }
@@ -70,7 +75,7 @@ abstract class ActiveObject extends Component implements yii\base\ViewContextInt
             throw new \Exception($class . ' has incorrect instance');
         }
         return $object;
-    }
+    }*/
 
     public function setState($key, $value){
         $name = $this->name ? $this->name : get_called_class();

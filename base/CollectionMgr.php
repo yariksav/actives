@@ -13,18 +13,19 @@ use yii\base\Object;
 
 class CollectionMgr extends Object
 {
+    use OwnedTrait;
+
     protected $_current;
     protected $_collection;
-    protected $owner;
 
     function __construct($owner, $config = []) {
         parent::__construct($config);
-        $this->owner = $owner;
+        $this->_owner = $owner;
     }
 
     protected function createItem($item) {
         return Yii::createObject($item, [
-            $this->owner
+            $this->_owner
         ]);
     }
     /**

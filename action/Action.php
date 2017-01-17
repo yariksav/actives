@@ -19,7 +19,7 @@ class Action extends ProtectedObject
     public $iconright;
     public $options;
     private $owner;
-    private $title;
+    private $text;
 
     function __construct($owner, $config = []) {
         parent::__construct($config);
@@ -33,21 +33,21 @@ class Action extends ProtectedObject
         return $this->_visible && $this->hasPermissions();
     }
 
-    public function getTitle() {
-        if (!$this->title) {
+    public function getText() {
+        if (!$this->text) {
             return Yii::t('actives', ucfirst($this->name));
         }
-        return $this->title;
+        return $this->text;
     }
 
-    public function setTitle($value) {
-        $this->title = $value;
+    public function setText($value) {
+        $this->text = $value;
     }
 
     public function output() {
         $res = [
             'type' => $this->type,
-            'text' => $this->getTitle()
+            'text' => $this->getText()
         ];
         if ($this->icon) {
             $res['icon'] = $this->icon;

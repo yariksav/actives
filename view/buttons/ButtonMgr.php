@@ -16,8 +16,8 @@ class ButtonMgr extends Collection
         'row' => 'yariksav\actives\view\buttons\RowButton'
     ];
 
-    protected function createObject($params) {
-        if (empty($params['name']) || is_int($params['name'])) {
+    protected function createItem($params, $name = null) {
+        if (!$name || is_int($name)) {
             throw new \Exception('Please get the name for control');
         }
 
@@ -36,9 +36,7 @@ class ButtonMgr extends Collection
                 $params['class'] = $type;
             }
         }
-        return Yii::createObject($params, [
-            $this->owner
-        ]);
+        return parent::createItem($params, $name);
     }
 
     protected function prepareButtons(){
@@ -57,12 +55,12 @@ class ButtonMgr extends Collection
         $result = [];
         if ($this->_collection) foreach ($this->_collection as $name=>$button) {
 
-            if ($model === false && $button instanceof RowButton) {
-                continue;
-            }
-            if ($model !== false && !($button instanceof RowButton)) {
-                continue;
-            }
+//            if ($model === false && $button instanceof RowButton) {
+//                continue;
+//            }
+//            if ($model !== false && !($button instanceof RowButton)) {
+//                continue;
+//            }
 
             if (!$button->isVisible($model) || !$button->hasPermissions()) {
                 continue;
@@ -70,9 +68,9 @@ class ButtonMgr extends Collection
 
             $btn = $button->build($model);
 
-            if (isset($button->buttons)){
-                $btn['buttons'] = $this->renderButtons($button->buttons, $data);
-            }
+//            if (isset($button->buttons)){
+//                $btn['buttons'] = $this->renderButtons($button->buttons, $data);
+//            }
             $result[$name] = $btn;
         }
         return $result;

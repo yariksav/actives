@@ -24,7 +24,7 @@ class ActiveControl extends Control {
         $this->component->run();
         return [
             'config'=>$this->component->getResponse(),
-            'component'=>$this->component->componentName
+            'cmp'=>$this->component->cmp
         ];
     }
 }

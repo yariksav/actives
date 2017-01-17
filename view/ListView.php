@@ -42,7 +42,7 @@ class ListView extends ActiveList
      */
     public $viewParams = [];
 
-    public $componentName = 'ListView';
+    public $cmp = 'ListView';
 
     /**
      * Renders a single data model.
@@ -69,11 +69,11 @@ class ListView extends ActiveList
         $tag = ArrayHelper::remove($options, 'tag', 'div');
         //$options['data-key'] = is_array($key) ? json_encode($key, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : $key;
         return [
-            'content'=>$content,
-            'key'=>$key,
-            'tag'=>$tag,
-            'options'=>$options,
-            'buttons' => $this->_buttons->buildRow($model),
+            '_key'=>$key,
+            '_tag'=>$tag,
+            '_plugins' => $this->_plugins->buildItem($model),
+            '_options'=>$options,
+            '_content'=>$content,
         ];
     }
 

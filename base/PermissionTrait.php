@@ -23,6 +23,9 @@ trait PermissionTrait
         if ($this->permissions === null) {
             $this->permissions = true;
         }
+        if (is_callable($this->permissions)) {
+            $this->permissions = call_user_func($this->permissions);
+        }
         if (is_string($this->permissions)) {
             if ($this->permissions === '*') {
                 $this->permissions = true;

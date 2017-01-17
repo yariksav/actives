@@ -8,12 +8,13 @@ use yii;
 use yii\base;
 use yii\base\Object;
 
-class FormAction extends ProtectedObject implements RunnableInterface
+class FormAction extends ProtectedObject
 {
-    public $name;
-    public $on;
-    public $after;
-    public $before;
+    //public $name;
+//    public $on;
+//    public $after;
+//    public $before;
+    public $render;
     public $type;
     public $data;
     public $icon;
@@ -38,9 +39,9 @@ class FormAction extends ProtectedObject implements RunnableInterface
     }
 
     public function getText() {
-        if (!$this->_text) {
-            return Yii::t('actives', ucfirst($this->name));
-        }
+//        if (!$this->_text) {
+//            return Yii::t('actives', ucfirst($this->name));
+//        }
         return $this->_text;
     }
 
@@ -66,44 +67,11 @@ class FormAction extends ProtectedObject implements RunnableInterface
     }
 
     public function run() {
-        if (is_callable($this->before)) {
-            call_user_func($this->before);
+        if (!$this->visible || !$this->hasPermissions()) {
+            throw new HttpException(423, Yii::t('app.error', 'You are not authorized to perform this action.'));
         }
-
-        if (is_callable($this->on)) {
-            call_user_func($this->on);
-        }
-
-        if (is_callable($this->after)) {
-            call_user_func($this->after);
+        if (is_callable($this->render)) {
+            return call_user_func($this->render);
         }
     }
-
-    /*public function enableEvents() {
-        $this->disableEvents();
-        if (!$this->visible) {
-            return;
-        }
-        if ($this->on) {
-            $this->owner->on($this->name, $this->on);
-        }
-        if ($this->after) {
-            $this->owner->on('after' . $this->name, $this->after);
-        }
-        if ($this->before) {
-            $this->owner->on('before' . $this->name, $this->before);
-        }
-    }
-
-    public function disableEvents() {
-        if ($this->on) {
-            $this->owner->off($this->name, $this->on);
-        }
-        if ($this->after) {
-            $this->owner->off('after' . $this->name, $this->after);
-        }
-        if ($this->before) {
-            $this->owner->off('before' . $this->name, $this->before);
-        }
-    }*/
 }

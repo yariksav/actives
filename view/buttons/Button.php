@@ -6,12 +6,10 @@ use yii\helpers\ArrayHelper;
 
 class Button extends ProtectedObject
 {
-    public $buttons;
     public $data;
+    public $item = false;
     public $icon;
-    public $name;
     public $text;
-    public $type;
     public $options;
 
     public function build($model) {

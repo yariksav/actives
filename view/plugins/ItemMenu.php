@@ -5,26 +5,23 @@ use yariksav\actives\view\buttons\ButtonMgr;
 use yii;
 
 
-class BaseMenu extends Plugin
+class ItemMenu extends Plugin
 {
-
+    public $buildItem;
     protected $_actions;
 
     function __construct($owner, $config = []) {
         $this->_actions = new ButtonMgr();
+        $this->buildItem = function($model) {
+            return [
+                'actions'=>$this->_actions->build($model),
+            ];
+        };
         parent::__construct($owner, $config);
     }
 
     public function setActions($value){
-        if (is_callable($value)) {
-            
-        }
         $this->_actions->load($value);
     }
 
-    public function build() {
-        return array_merge(parent::build(), [
-            'actions'=>$this->_actions->build(),
-        ]);
-    }
 }

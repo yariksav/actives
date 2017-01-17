@@ -125,9 +125,9 @@ class ColumnMgr extends Collection
         $this->setState('columnsState', json_encode($this->request['columns']));
     }
 
-    public function buildRow($model, $key, $index) {
+    public function buildItem($model, $key, $index) {
         $result = [];
-        if ($this->_collection) foreach($this->_collection as $column) {
+        foreach($this as $column) {
             $result[$column->name] = $column->renderDataCell($model, $key, $index);
         }
         return $result;

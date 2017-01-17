@@ -10,13 +10,32 @@ class Sort extends Plugin
 
     public $columns = [];//todo split logic Sort
 
+    function init() {
+        $this->registerEvents();
+        parent::init();
+    }
+
     public function build() {
         return array_merge(parent::build(), [
             'value'=>$this->value
         ]);
     }
 
-    public function setProvider($provider) {
+    protected function registerEvents() {
+        //todo!!!
+//        if (is_callable($this->apply)) {
+//            $this->owner->on('beforeData', function ($event) {
+//                if ($this->getValue()) {
+//                    call_user_func_array($this->apply, [
+//                        $event->sender->provider,
+//                        $this->_value
+//                    ]);
+//                }
+//            });
+//        }
+    }
+
+/*    public function setProvider($provider) {
         if ($this->apply) {
             parent::setProvider($query);
         } else {
@@ -38,5 +57,5 @@ class Sort extends Plugin
                 }
            // }
         }
-    }
+    }*/
 }

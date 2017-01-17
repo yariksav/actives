@@ -12,9 +12,10 @@ class ManagerGrid extends Grid
             'sort'=>[
                 'remember'=>true
             ],
-            'pagination',
+            'SummaryInfo',
+            //'Pagination',
             'loader',
-            'refresh',
+            'Refresh',
         ];
     }
 }

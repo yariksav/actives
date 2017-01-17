@@ -42,7 +42,7 @@ class ImageList extends ActiveList
      */
     public $viewParams = [];
 
-    public $componentName = 'ImageList';
+    public $cmp = 'ImageList';
 
     /**
      * Renders a single data model.

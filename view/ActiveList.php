@@ -18,18 +18,6 @@ abstract class ActiveList extends ActiveView
     public $identifier = 'id';
 
     protected $_provider;
-//    protected $_data;
-//
-//
-//    public function getData() {
-//        return $this->_data;
-//    }
-
-    function init() {
-        if ($this->_provider && $this->_plugins) {
-            $this->_plugins->setProvider($this->_provider);
-        }
-    }
 
     public function setData($value) {
         $this->_data = $value;
@@ -76,6 +64,7 @@ abstract class ActiveList extends ActiveView
      */
     public function renderItems()
     {
+        $this->trigger('beforeData');
         $models = $this->_provider->getModels();
         $keys = $this->_provider->getKeys();
         $rows = [];
@@ -83,8 +72,32 @@ abstract class ActiveList extends ActiveView
             $rows[] = $this->renderItem($model, $keys[$index], $index);
         }
         $this->_response->data = new \stdClass();
-        $this->_response->data->rows = $rows;
+        $this->_response->data->collection = $rows;
         $this->_response->data->total = $this->_provider->getTotalCount();
+
+        if ($this->_provider->pagination) {
+            $this->_response->data->pagination = [
+                'limit' => $this->_provider->pagination->getLimit(),
+                'offset' => $this->_provider->pagination->getOffset()
+            ];
+        }
+    }
+
+    /**
+     * Renders a single data model.
+     * @param mixed $model the data model to be rendered
+     * @param mixed $key the key value associated with the data model
+     * @param integer $index the zero-based index of the data model in the model array returned by [[dataProvider]].
+     * @return string the rendering result
+     */
+    public function renderItem($model, $key, $index)
+    {
+//        $row = [
+//            'buttons' => $this->_buttons->buildRow($model),
+//            'cells' => $this->_columns->buildRow($model, $key, $index),
+//            'key' => $key,
+//        ];
+//        return $row;
     }
 
     protected function renderOptions() {
@@ -93,5 +106,29 @@ abstract class ActiveList extends ActiveView
             $this->_response->title = $this->title;
         }
     }
+
+
+
+    public function actionExport(){
+        $this->prepareData();
+        $this->_provider->pagination = false;
+
+        $data = $this->_provider->getModels();
+        $exportData = [];
+        //todo
+        //        if (($count = $this->_provider->getCount()) > 0) {
+        //            if (count($data) > 0) {
+        //                foreach ($data as $row => $item) {
+        //                    $exportData[] = $this->_columns->buildRow($row, $item);
+        //                }
+        //            }
+        //        }
+
+        $this->_plugins['export']->current->export($exportData);
+//
+//        Yii::$app->response->format = 'html';
+//        Yii::$app->end();
+    }
+
 
 }

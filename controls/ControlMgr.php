@@ -86,10 +86,11 @@ class ControlMgr extends Collection {
         }
     }
 
-    protected function createObject($params) {
-        if (empty($params['name']) || is_int($params['name'])) {
+    protected function createItem($params, $name = null) {
+        if (!$name || is_int($name)) {
             throw new \Exception('Please get the name for control');
         }
+        $params['name'] = $name;
 
         if (empty($params['type']) && empty($params['class'])) {
             throw new yii\base\Exception('Control must have type or class property');
@@ -118,7 +119,7 @@ class ControlMgr extends Collection {
         }
 
         $controls = [];
-        foreach ($this as $name=>$control) {
+        foreach ($this as $name => $control) {
             if ($control && $control->visible && $control->hasPermissions()) {
                 $controls[$name] = $control->build();
             }
@@ -126,11 +127,11 @@ class ControlMgr extends Collection {
         return $controls;
     }
 
-    public function update($data){
-        if (!$data) {
+    public function setValues($values){
+        if (!$values) {
             return;
         }
-        foreach ($data as $name=>$value) {
+        foreach ($values as $name=>$value) {
             $control = isset($this->_collection[$name]) ? $this->_collection[$name] : null;
             if ($control && $control->visible && $control->hasPermissions()) {
                 $control->update($value);

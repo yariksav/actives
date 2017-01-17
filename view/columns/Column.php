@@ -2,6 +2,7 @@
 
 namespace yariksav\actives\view\columns;
 
+use yariksav\actives\base\OwnedTrait;
 use yii;
 use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
@@ -13,6 +14,7 @@ use yariksav\actives\base\ProtectedObject;
 
 class Column extends ProtectedObject
 {
+    use OwnedTrait;
 
     public $name;
     public $value;
@@ -36,13 +38,10 @@ class Column extends ProtectedObject
     public $headerOptions = [];
     //public $footerOptions = [];
 
-    //-------------
-    protected $owner;
-
 
     function __construct($owner, $config = []) {
         parent::__construct($config);
-        $this->owner = $owner;
+        $this->_owner = $owner;
     }
 
     public function init()
@@ -86,7 +85,7 @@ class Column extends ProtectedObject
 
     public function renderHeader()
     {
-        $provider = $this->owner->provider;
+        $provider = $this->_owner->provider;
         $header = $this->header;
         if ($header === null && $provider) {
             if ($provider instanceof ActiveDataProvider && $provider->query instanceof ActiveQueryInterface) {

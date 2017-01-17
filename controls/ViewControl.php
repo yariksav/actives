@@ -15,7 +15,7 @@ class ViewControl extends ActiveControl {
 
 //    public function load() {
 //        return array_merge(parent::load(), [
-//            'component' => $instance->componentName
+//            'cmp' => $instance->cmp
 //        ]);
 //    }
 }

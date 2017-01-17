@@ -13,27 +13,43 @@ class PluginMgr extends Collection
 {
 
     public static $builtInPlugins = [
-        'loader' =>     'yariksav\actives\view\plugins\Plugin',
-        'refresh' =>    'yariksav\actives\view\plugins\Plugin',
+        'Loader' =>     'yariksav\actives\view\plugins\Plugin',
+        'Refresh' =>    'yariksav\actives\view\plugins\Plugin',
 
-        'pagination' => 'yariksav\actives\view\plugins\Pagination',
-        'sort' =>       'yariksav\actives\view\plugins\Sort',
-        'search' =>     'yariksav\actives\view\plugins\Search',
-        'filter' =>     'yariksav\actives\view\plugins\Filter',
-        'export' =>     'yariksav\actives\view\plugins\Export',
+        'Pagination' => 'yariksav\actives\view\plugins\Pagination',
+        'InfinityScroll' => 'yariksav\actives\view\plugins\InfinityScroll',
+        'SummaryInfo' => 'yariksav\actives\view\plugins\Plugin',
 
-        'manage' =>     'yariksav\actives\view\plugins\BaseMenu',
-        'columnMenu' => 'yariksav\actives\view\plugins\ColumnMenuPlugin',
-        'contextMenu' => 'yariksav\actives\view\plugins\ContextMenuPlugin',
+        'Sort' =>       'yariksav\actives\view\plugins\Sort',
+        'Search' =>     'yariksav\actives\view\plugins\Search',
+        'Filter' =>     'yariksav\actives\view\plugins\Filter',
+        'Export' =>     'yariksav\actives\view\plugins\Export',
+
+        'Manage' => [
+            'class' => 'yariksav\actives\view\plugins\BaseMenu',
+            'cmp' => 'Manage'
+        ],
+        'PopoverMenu' => [
+            'class' => 'yariksav\actives\view\plugins\ItemMenu',
+            'cmp' => 'PopoverMenu'
+        ],
+        'ColumnMenu' => [
+            'class' => 'yariksav\actives\view\plugins\ItemMenu',
+            'cmp' => 'ColumnMenu'
+        ],
+        'ContextMenu' => [
+            'class'=>'yariksav\actives\view\plugins\ItemMenu',
+            'cmp' => 'ContextMenu'
+        ],
     ];
 
-    protected function createObject($params) {
-        if (empty($params['name']) || is_int($params['name'])) {
+    protected function createItem($params, $name = null) {
+        if (!$name || is_int($name)) {
             throw new \Exception('Please get the name for control');
         }
 
         if (empty($params['type']) && empty($params['class'])) {
-            $params['type'] = $params['name'];
+            $params['type'] = $name;
         }
 
         if (isset($params['type'])) {
@@ -47,27 +63,28 @@ class PluginMgr extends Collection
                 $params['class'] = $type;
             }
         }
-
-        return Yii::createObject($params, [
-            $this->owner
-        ]);
+        unset($params['type']);
+        return parent::createItem($params, $name);
     }
 
     public function build() {
         $plugins = [];
-        if ($this->_collection) foreach ($this->_collection as $key => $plugin) {
-            if ($plugin->visible) {
+        foreach ($this as $key => $plugin) {
+            if ($plugin->visible && $plugin->hasPermissions()) {
                 $plugins[$key] = $plugin->build();
             }
         }
         return $plugins ? : null;
     }
 
-    public function setProvider($provider) {
-        if ($this->_collection) {
-            foreach ($this->_collection as $key => $plugin) {
-                $plugin->setProvider($provider);
+    public function buildItem($model) {
+        $plugins = [];
+        foreach ($this as $name=>$plugin) {
+            if ($plugin->visible && $plugin instanceof ItemMenu) { //is_callable($plugin->renderItem)
+                $plugins[$name] = call_user_func($plugin->buildItem, $model);
             }
         }
+        return $plugins ? : null;
     }
+
 }

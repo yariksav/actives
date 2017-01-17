@@ -12,11 +12,10 @@ class FormsMgr extends Collection
 {
     public $config = [];
 
-    protected function createObject($params) {
+    protected function createItem($params, $name = null) {
         $params = array_merge($params, $this->config);
-        $name = $params['name'];
-        if (empty($name) || is_int($name)) {
-            throw new \Exception('Please get the name for action');
+        if (!$name || is_int($name)) {
+            throw new \Exception('Please get the name for form');
         }
         // set specific key
         if (isset($this->config['key'][$name])) {

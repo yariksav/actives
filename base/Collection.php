@@ -14,19 +14,18 @@ use yii\helpers\ArrayHelper;
 
 class Collection extends Object implements \Iterator
 {
-    //protected $_current;
+    use OwnedTrait;
     protected $_collection;
-    protected $owner;
 
     function __construct($owner = null, $config = []) {
         parent::__construct($config);
-        $this->owner = $owner;
+        $this->_owner = $owner;
         $this->_collection = [];
     }
 
-    protected function createItem($item) {
+    protected function createItem($item, $name = null) {
         return Yii::createObject($item, [
-            $this->owner
+            $this->_owner
         ]);
     }
 
@@ -65,16 +64,16 @@ class Collection extends Object implements \Iterator
                 $item = ['class'=>$item];
             }
 
-            if (is_array($item)) {
-                // if only necessary to add params
-                if (empty($item['name'])) {
-                    $item['name'] = $name;
-                }
-            }
+//            if (is_array($item)) {
+//                // if only necessary to add params
+//                if (empty($item['name'])) {
+//                    $item['name'] = $name;
+//                }
+//            }
 
             $position = ArrayHelper::remove($item, '~position');
 
-            if ($instance = $this->createObject($item)) {
+            if ($instance = $this->createItem($item, $name)) {
                 if ($position !== null) {
                     $insert = [];
                     $insert[$name] = $instance;

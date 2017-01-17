@@ -14,7 +14,7 @@ use yariksav\actives\view\columns\ColumnMgr;
 class TreeView extends ActiveList
 {
     //protected $_columns;
-    public $componentName = 'Tree';
+    public $cmp = 'Tree';
 
     function __construct($config = []) {
       //  $this->_columns = new ColumnMgr($this);

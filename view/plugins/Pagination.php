@@ -6,53 +6,64 @@ use yii;
 class Pagination extends Plugin
 {
     protected $_pageSize;
-    public $text;
-    public $page = 1;
-    public $pageCount = 5;
+    protected $_page = 0;
 
     public $collection = [
         5=>'5',
         20=>'20',
-        50=>'50',
-        100=>'100'
+        100=>'100',
+        //-1=>'All'
     ];
 
     function init() {
-        if (!$this->_pageSize) {
-            $this->_pageSize = array_keys($this->collection)[0];
-        }
-        if (!$this->text) {
-            $this->text = Yii::t('actives', 'Show <span></span> elements');
-        }
+        $this->registerEvents();
         parent::init();
+    }
+
+    protected function registerEvents() {
+        $this->owner->on('beforeData', function ($event) {
+            $owner = $event->sender;
+            $provider = $owner->provider;
+            if ($this->pageSize > 0) {
+                $provider->pagination->pageSize = $this->pageSize;
+                $provider->pagination->page = $this->page;
+            } else {
+                $provider->pagination = false;
+            }
+        }, [$this]);
     }
 
     public function build() {
         return array_merge(parent::build(), [
-            'text' => $this->text,
             'collection' => $this->collection,
             'pageSize' => $this->pageSize,
-            'pageCount' => $this->pageCount,
-            'page' => $this->page
         ]);
     }
 
-    public function setProvider($provider) {
-        $provider->pagination->pageSize = $this->pageSize;
-        $provider->pagination->page = $this->page - 1;
+    public function getPage() {
+        return $this->_page;
+    }
+
+    public function setPage($value) {
+        $this->_page = $value;
     }
 
     public function getPageSize() {
-        if ($this->owner->method === 'init') {
-            $this->_pageSize = $this->owner->getState($this->name.'size', $this->_pageSize);
+        if (!$this->_pageSize) {
+            $this->_pageSize = $this->owner->getState($this->owner->className().'size', array_keys($this->collection)[0]);
         }
         return $this->_pageSize;
     }
 
     public function setPageSize($value) {
-        $this->_pageSize = $value;
-        if ($this->owner->method === 'load') {
-            $this->owner->setState($this->name.'size', $value);
+        if (isset($this->collection[$value])) {
+            $this->_pageSize = $value;
+        }
+    }
+
+    public function setPageSizeChanged($value) {
+        if (isset($this->collection[$value]) && $value > 0) {
+            $this->owner->setState($this->owner->className() . 'size', $value);
         }
     }
 }

@@ -18,7 +18,7 @@ class BaseDialog extends ActiveObject {
     protected $_action;
     protected $isNewRecord;
     protected $_config;
-    public $componentName = 'Dialog'; //????
+    public $cmp = 'Dialog'; //????
 
     public function __construct($config = []) {
         $this->key =  ArrayHelper::getValue($config, 'key');

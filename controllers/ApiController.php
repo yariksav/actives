@@ -12,8 +12,8 @@ use yii\helpers\ArrayHelper;
 use yariksav\actives;
 use yariksav\actives\base\ActiveObject;
 use yariksav\actives\base\Exception;
-use yariksav\actives\dialog\ConfirmException;
-use yariksav\actives\dialog\ValidationException;
+use yariksav\actives\exceptions\ConfirmException;
+use yariksav\actives\exceptions\ValidationException;
 
 class ApiController extends Controller
 {
@@ -32,43 +32,57 @@ class ApiController extends Controller
 
     public $enableCsrfValidation = false;
 
-    public function actionIndex(){
+    public function createInstance($alias, $component, $data){
+        unset($data['permissions'], $data['actions'], $data['controls']);
+
+        $class = ArrayHelper::getValue(Yii::$app->params['alias'], $alias). '\\' . ucfirst($component);
+
+        if (!class_exists($class)) {
+            throw new \Exception('Unknown request');
+        }
+        $instance = Yii::createObject($class, $data);
+        if (!$instance instanceof actives\base\RunnableInterface) {
+            throw new \Exception('Incorrect method');
+        }
+        return $instance;
+    }
+
+    public function actionComponent($alias, $component, $action = null){
+
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         Yii::$app->response->headers->add('Access-Control-Allow-Origin','*');
+        Yii::$app->response->headers->add('Content-type','application/json');
 
-        $dialog = null;
         $response = [];
         try{
-            $data = json_decode(urldecode(file_get_contents("php://input")), true);
-            unset($data['permissions'], $data['actions'], $data['controls'], $data['fields']);
-
-            $dialog = ActiveObject::createObject($data);
-            $response = json_encode($dialog->run());
+            $request = json_decode(urldecode(Yii::$app->request->rawBody), true);
+            if (!$request) {
+                $request = [];
+            }
+            $instance = $this->createInstance($alias, $component, $request);
+            return $instance->run($action);
         }
+
         // Для логики опросов
         catch (ConfirmException $e){
-            $confirm['confirm'] = ArrayHelper::getValue($data, 'confirm', []);
+            $confirm['confirm'] = ArrayHelper::getValue($request, 'confirm', []);
             $confirm['confirm'][$e->id] = [
                 'message'=>$e->getMessage(),
                 'buttons'=>$e->buttons
             ];
-            $response = json_encode($confirm);
-        }
-        catch (ValidationException $e){
-            $response = json_encode([
-                'error'=>$e->getMessage(),
-                'validation'=>$e->validation
-            ]);
-        }
-        catch (HttpException $e){
-            throw $e;
+            return $confirm;
         }
 
-        Yii::$app->response->format = 'html';
-        return $response;
+        catch (ValidationException $e){
+            Yii::$app->response->setStatusCode(400);
+            return $e->validation;
+        }
     }
 
-    public function actionExport() {
-
+    public function actionExport($alias, $component) {
+        Yii::$app->response->format = 'html';
+        $instance = $this->createInstance($alias, $component, $_GET);
+        $instance->run('export');
+        Yii::$app->end();
     }
 }

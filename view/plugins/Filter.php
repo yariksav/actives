@@ -13,6 +13,19 @@ class Filter extends Plugin
         $this->_controls = new ControlMgr($owner);
         parent::__construct($owner, $config);
         $this->_controls->model = $this->value;
+        $this->registerEvents();
+    }
+
+    protected function registerEvents() {
+        $this->owner->on('beforeData', function ($event) {
+            $values = $this->value;
+            $provider = $event->sender->provider;
+            foreach($this->_filters as $key=>$filter) {
+                if (isset($values[$key]) && $values[$key] !== '') {
+                    call_user_func($filter, $provider, $values[$key]);
+                }
+            }
+        });
     }
 
     function setControls ($controls) {
@@ -37,13 +50,4 @@ class Filter extends Plugin
         ]);
     }
 
-    public function setProvider($provider) {
-        parent::setProvider($provider);
-        $values = $this->value;
-        foreach($this->_filters as $key=>$filter) {
-            if (isset($values[$key]) && $values[$key] !== '') {
-                call_user_func($filter, $provider, $values[$key]);
-            }
-        }
-    }
 }

@@ -4,6 +4,8 @@ namespace yariksav\actives\dialog;
 
 
 use yariksav\actives\base\ViewerTrait;
+use yariksav\actives\exceptions\ConfirmException;
+use yariksav\actives\exceptions\ValidationException;
 use yii;
 use yii\base\Model;
 use yii\helpers\Url;
@@ -231,9 +233,9 @@ class Dialog extends BaseDialog {
         $control = $this->_controls->get($name);
 
         if (!$control || !$control->visible || !$control->hasPermissions()) {
-            throw new Exception(Yii::t('actives', 'Control "{0}" was not found', [$name]));
+            throw new yii\base\Exception(Yii::t('actives', 'Control "{0}" was not found', [$name]));
         }
-        $control->config = array_merge(['method'=>''], $control->config, $this->control, ['class' => $control->config['class']]);
+        $control->config = array_merge(/*['method'=>''],*/ $control->config ?:[], $this->control, ['class' => $control->config['class']]);
         if ($control->requireModel) {
             $control->model = $this->getModel();
         }
@@ -244,12 +246,14 @@ class Dialog extends BaseDialog {
         if (!$model) {
             $model = $this->model;
         }
-        $tran = $model->db->beginTransaction();
-        $model->delete();
-        if ($model->errors) {
-            $this->validation = $model->errors;
-        } else {
-            $tran->commit();
+        if ($model) {
+            $tran = $model->db->beginTransaction();
+            $model->delete();
+            if ($model->errors) {
+                $this->validation = $model->errors;
+            } else {
+                $tran->commit();
+            }
         }
     }
 

@@ -23,13 +23,15 @@ class Control extends Component
     use PermissionTrait;
     use VisibleTrait;
 
-    public $config = [];
+    public $config;
     public $save;
     public $afterSave;
     public $default;
     public $validate;
     public $data;
-    public $options;
+    public $placeholder;
+
+    public $validation;
 
     /**
      * @var boolean Is model riquired for build control data.
@@ -151,7 +153,7 @@ class Control extends Component
 
     /**
      * Returns the name for the control.
-     * @return array the options
+     * @return string
      */
     public function getName() {
         return $this->_name;
@@ -162,7 +164,6 @@ class Control extends Component
     }
 
 
-
     public function getWrapper() {
         return $this->_wrapper;
     }
@@ -170,23 +171,33 @@ class Control extends Component
     public function setWrapper($value) {
         $this->_wrapper = $value;
     }
+
     /**
      * Builds full control config array.
      * @return array the control config
      */
     public function build() {
         $control = [
-            'type' => $this->_type,
-            'name' => $this->_name,
-            'value' => $this->value,
+            'type' => $this->_type
         ];
-        $text = $this->text;
-        if ($text) {
+
+        $value = $this->value;
+        if ($value !== null) {
+            $control['value'] = $value;
+        }
+        if ($text = $this->text) {
             $control['text'] = $text;
         }
-        if ($this->options) {
-            $control['config'] = $this->options;
+        if ($placeholder = $this->placeholder) {
+            $control['placeholder'] = $placeholder;
         }
+        if ($this->config) {
+            $control['config'] = $this->config;
+        }
+        if ($this->validation) {
+            $control['validation'] = $this->validation;
+        }
+
         return array_merge($control, $this->load());
     }
 

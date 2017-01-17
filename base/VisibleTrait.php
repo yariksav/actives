@@ -25,7 +25,7 @@ trait VisibleTrait
         if (is_callable($this->_visible)) {
             $this->_visible = call_user_func_array($this->_visible, []);
         }
-        return $this->_visible;/* && $this->hasPermissions(); todo */
+        return $this->_visible;
     }
 
     public function setVisible($value) {

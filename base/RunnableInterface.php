@@ -17,5 +17,5 @@ interface RunnableInterface
     /**
      * @return object the response.
      */
-    public function run();
+    public function run($action = null);
 }
